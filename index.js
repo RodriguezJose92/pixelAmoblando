@@ -42,7 +42,7 @@ class MudiPixel{
             /** verify Test */
             let testMudi = localStorage.getItem('UserMudiTest');
 
-            if(testMudi){this.testType = testMudi}
+            if(testMudi !== null){this.testType = testMudi}
             else{
                 /** Petition Server */
                 const newBody = {"idCompany": this.idCompany};
@@ -55,6 +55,8 @@ class MudiPixel{
                 const response = await request.json(); 
                 await this.updateTesting(response.data[0].test)
             };
+
+            console.log(this.testType)
 
         };
 
