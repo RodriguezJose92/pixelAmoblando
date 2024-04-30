@@ -4,6 +4,7 @@ class MudiPixel{
     constructor(){
 
         /** General Info  */
+        this.testType                       = null; 
         this.userID                         = null; //✔️ 
         this.path                           = null; //✔️
         this.device                         = null; //✔️
@@ -34,6 +35,45 @@ class MudiPixel{
         this.verifySkuNumber                = 0; //✔️
 
     };
+
+    /** Build Test AB */
+        async verifyTestingAB(){
+
+            /** verify Test */
+            let testMudi = localStorage.getItem('UserMudiTest');
+
+            if(testMudi){this.testType = testMudi}
+            else{
+                /** Petition Server */
+                const newBody = {"idCompany": this.idCompany};
+                const request = await fetch(`https://viewer.mudi.com.co:3589/api/mudiv1/getInfoTest`,{
+                    method:'POST',
+                    headers:{"Content-type":"application/json"},
+                    body: JSON.stringify(newBody)
+                });
+
+                const response = await request.json(); 
+                await this.updateTesting(response.data[0].test)
+            };
+
+        };
+
+        async updateTesting(lastTest){
+            
+            /** Updatte testing */
+            let testUpdate;
+            lastTest == 'A' ? (testUpdate = 'B') : (testUpdate = 'A');
+            
+            const newBody = {"idCompany": this.idCompany , "typeTest": testUpdate};
+            const request = await fetch(``,{
+                method:'POST',
+                headers:{"Content-type":"application/json"},
+                body: JSON.stringify(newBody)
+            })
+
+            this.testType = testUpdate;
+            localStorage.setItem('UserMudiTest',testUpdate)
+        };
 
     /** Events for DOM verification */
 
@@ -316,7 +356,8 @@ class MudiPixel{
                     category        : this.category,
                     subCategory     : this.subCategory,
                     skuNumber       : this.skuNumber,
-                    idCompany       : this.idCompany
+                    idCompany       : this.idCompany,
+                    testType        : this.testType
                 };
 
                 const request = fetch('https://viewer.mudi.com.co:3589/api/mudiv1/registryPixelMudi',{
@@ -336,6 +377,9 @@ class MudiPixel{
         await this.identifyUserMudi();
 
         this.userID && (
+
+            /** Verify Testing AB */
+                this.verifyTestingAB(),
 
             /** DOM VERIFY */
 
