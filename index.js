@@ -177,6 +177,8 @@ class MudiPixel{
             ? ( 
                 this.viewerEvent ++ , 
                 document.body.querySelector('.btnMudi3D').addEventListener('click',()=>{
+                    this.readObjectDB();
+                    this.createRegistryDB();
                     this.interaction3D++;
                     this.verifyBtnAR();
                 }) ,
@@ -248,7 +250,7 @@ class MudiPixel{
                 const db            = this.DBMudiProducts.result;
                 const sku           = db.transaction('products','readwrite');
                 const objectStore   = sku.objectStore('products');
-                objectStore.add({"sku": "3435335" , "fechaCreacion": "2024-05-20 23:59:59" });        
+                objectStore.add({"sku": this.skuNumber , "fechaCreacion": this.date });        
             };
 
             /** 7.2 DeleteRegistry because date */
