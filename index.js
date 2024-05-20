@@ -34,6 +34,9 @@ class MudiPixel{
         this.btnARVerify                    = 0; //✔️
         this.verifySkuNumber                = 0; //✔️
 
+        /** IndexDataBase */
+        this.DBMudiProducts                 = indexedDB.open('productsMudi', 1);
+
     };
 
     /** Build Test AB */
@@ -56,8 +59,6 @@ class MudiPixel{
                 await this.updateTesting(response.data[0].test)
             };
 
-            console.log(this.testType)
-
         };
 
         async updateTesting(lastTest){
@@ -67,7 +68,7 @@ class MudiPixel{
             lastTest == 'A' ? (testUpdate = 'B') : (testUpdate = 'A');
             
             const newBody = {"idCompany": this.idCompany , "typeTest": testUpdate};
-            const request = await fetch(``,{
+            const request = await fetch(`https://viewer.mudi.com.co:3589/api/mudiv1/updateInfoTest`,{
                 method:'POST',
                 headers:{"Content-type":"application/json"},
                 body: JSON.stringify(newBody)
@@ -91,7 +92,8 @@ class MudiPixel{
 
             /** Add Evento addToCar || Resend  */
             element 
-            ? ( element.parentNode.addEventListener('click',()=>this.addToCar ++) , console.log("%cMudi Pixel: \n","color:#820ad1; font-weight:600","Add To car Correctly setting 🚀" ) ) 
+            ? ( element.parentNode.addEventListener('click',()=>this.addToCar ++) , 
+                console.log("%cMudi Pixel: \n","color:#820ad1; font-weight:600","Add To car Correctly setting 🚀" ) ) 
             : ( requestAnimationFrame(this.verifyAddToCar.bind(this)) , this.verifyAddToCarButton ++ );
 
         };
@@ -116,17 +118,50 @@ class MudiPixel{
         /** 3. VerifyBuyButton -- Purchase Completion ✔️ */
         verifyPurchase(){
 
-            /** Declared DOM BreadCrumb*/
+            /** Declared btn Purchase*/
             let 
             purchaseBtn         = document.body.querySelector(`.send-event-purchase`); // CUSTOM ELEMENT breadcrumb
 
-            /** Add Evento addToCar || Resend  */
+            /** Verify purcahseBtn*/
+            if(this.verifyPurchaseButton  > 5000) { console.log("%cMudiPixel:\n","color:#820ad1; font-weight:600","Purchase was not found ❌"); return false};
+
+            /** Add Event Purchase || Resend  */
             purchaseBtn 
             ? ( purchaseBtn.addEventListener('click',()=> this.purchaseClick ++) , 
+                this.verifyproductInteractive3D(),
                 console.log("%cMudi Pixel: \n","color:#820ad1; font-weight:600","Purchase Correctly setting 🚀" ) ) 
             : ( requestAnimationFrame(this.verifyPurchase.bind(this)) , this.verifyPurchaseButton++  );
         };
+            /** 3.1 Verify interaction with products 3D Experience */
+            verifyproductInteractive3D(){
+                
+                const allProductsSkus = document.body.querySelectorAll('.media-content-details')
 
+                for(let i = 0; i<allProductsSkus.length; i++){
+
+                    /** Get SKU NUMBER Cars product to Pay */
+                    let productSKU = allProductsSkus[i].querySelector('.col-xs-10').innerHTML;
+
+                    /** Open indexDB */
+                    const db            = this.DBMudiProducts.result;
+                    const sku           = db.transaction('products','readonly');
+                    const objectStore   = sku.objectStore('products');
+                    const 
+                    cursor              = objectStore.openCursor();
+                    let array = [];
+        
+                    cursor.addEventListener("success",()=>{
+                        if(cursor.result){
+                            productSKU == cursor.result.value.sku && array.push(productSKU) 
+                            cursor.result.continue();
+                        }else console.log('consulta realizada');
+                    });
+
+                    this.skuNumber=array;
+                };
+            };
+
+            
         /** 4. Verify container Btns Mudi PDP ✔️ */
         verifyContainerBtnsMudi(){
 
@@ -188,6 +223,74 @@ class MudiPixel{
             : ( requestAnimationFrame(this.verifySku.bind(this)) , this.verifySkuNumber ++  );
 
         };
+
+
+        /** 7. Create Registry and DBIndexed Mudi */
+        createDB(){
+
+            this.DBMudiProducts.addEventListener('upgradeneeded',()=>{
+                let resultRequest = DBMudiProducts.result;
+                resultRequest.createObjectStore('products',{autoIncrement:true});
+            });
+
+            this.DBMudiProducts.addEventListener('success',()=>{
+                console.log('Todo salió bien')
+            });
+
+            this.DBMudiProducts.addEventListener('error',()=>{
+                throw new Error('No pudimos abrir ni crear la base de datos del pixel de Mudi')
+            });
+            
+        };
+            /** 7.1 Create registyDB */
+            createRegistryDB(){
+    
+                const db            = this.DBMudiProducts.result;
+                const sku           = db.transaction('products','readwrite');
+                const objectStore   = sku.objectStore('products');
+                objectStore.add({"sku": "3435335" , "fechaCreacion": "2024-05-20 23:59:59" });        
+            };
+
+            /** 7.2 DeleteRegistry because date */
+            deleteRegistryDB(key){
+                const db            = this.DBMudiProducts.result;
+                const sku           = db.transaction('products','readwrite');
+                const objectStore   = sku.objectStore('products');
+                objectStore.delete(key);
+            };
+
+            /** 7.3 Read Info productsMudi */
+            readObjectDB(){
+
+                const verifydate = (dateMudi,key) =>{
+                    const _getYear = new Date().getFullYear()
+                    const _getMonth = new Date().getMonth()+1;
+                    const _getday = new Date().getDate();
+                    const DateMudi = dateMudi.split(' ')[0].split('-');
+
+                    if(_getYear > DateMudi[0] || _getMonth > DateMudi[1] || _getday > DateMudi[2]){
+                        this.deleteRegistryDB(key)
+                    };
+                };
+    
+                const db            = this.DBMudiProducts.result;
+                const sku           = db.transaction('products','readonly');
+                const objectStore   = sku.objectStore('products');
+                const 
+                cursor        = objectStore.openCursor();
+
+                cursor.addEventListener("success",()=>{
+
+                    if (cursor.result){
+                        verifydate(cursor.result.value.fechaCreacion , cursor.result.key);
+                        cursor.result.continue();
+                    }else{
+                        console.log('consulta realizada')
+                    };
+                    
+                })
+    
+            };
 
 
     /** Events info General */
@@ -419,4 +522,5 @@ class MudiPixel{
 
 const 
 mudiPixel = new MudiPixel();
+window.mudiPixel = mudiPixel;
 mudiPixel.pixelMudiOn();
