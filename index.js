@@ -177,8 +177,8 @@ class MudiPixel{
             ? ( 
                 this.viewerEvent ++ , 
                 document.body.querySelector('.btnMudi3D').addEventListener('click',()=>{
-                    this.readObjectDB();
                     this.createRegistryDB();
+                    this.readObjectDB();
                     this.interaction3D++;
                     this.verifyBtnAR();
                 }) ,
@@ -246,7 +246,6 @@ class MudiPixel{
         };
             /** 7.1 Create registyDB */
             createRegistryDB(){
-    
                 const db            = this.DBMudiProducts.result;
                 const sku           = db.transaction('products','readwrite');
                 const objectStore   = sku.objectStore('products');
