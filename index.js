@@ -177,10 +177,10 @@ class MudiPixel{
             ? ( 
                 this.viewerEvent ++ , 
                 document.body.querySelector('.btnMudi3D').addEventListener('click',()=>{
-                    
+
                     this.createDB();
-                    this.readObjectDB();
                     this.createRegistryDB();
+                    this.readObjectDB();
 
                     this.interaction3D++;
                     this.verifyBtnAR();
