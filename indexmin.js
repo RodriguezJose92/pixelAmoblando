@@ -249,7 +249,7 @@ class MudiPixel{
 
                 const result = listProducts.filter(registry =>{
                     let dateRegistry = registry.fechaCreacion.split(' ')[0];
-                    if ( dateToday == dateRegistry ) return result
+                    if ( dateToday == dateRegistry ) return registry
                 });
                 localStorage.setItem('productsMudi', JSON.stringify(listProducts))
             };
