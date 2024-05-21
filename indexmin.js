@@ -141,7 +141,7 @@ class MudiPixel{
                     /** Get SKU NUMBER --- Cards product to Pay */
                     let productSKU = allProductsSkus[i].querySelector('.col-xs-10').innerHTML;
 
-                    const listProductStorage = JSON.parse(localStorage.getItem('productMudi'));
+                    const listProductStorage = JSON.parse(localStorage.getItem('productsMudi'));
                     if(!listProductStorage) return;
                 
                     const filter = listProductStorage.find( registry => productSKU == registry.sku );
@@ -218,17 +218,19 @@ class MudiPixel{
 
         /** 7. Verify product Exist */
         verifyDataProducst(){
-            let productListStorage = JSON.parse( localStorage.getItem('productMudi') ) , structure;
-            const filter = () => !productListStorage ? {} : productListStorage.find( registry => this.skuNumber == registry.sku)
+            let productListStorage = JSON.parse( localStorage.getItem('productsMudi') ) , structure;
+            const filter = () => !productListStorage ? null : productListStorage.find( registry => this.skuNumber == registry.sku)
 
             console.log(filter())
 
             switch ( filter() ){
-                case {}:
+                case null:
+                    console.log('creando localStorage')
                     productListStorage = [{"sku": this.skuNumber, "fechaCreacion": this.date}],
                     localStorage.setItem('productsMudi', productListStorage)
                     break;
                 case undefined :
+                    console.log('agergando producto')
                     structure = {"sku":this.skuNumber, "fechaCreacion": this.date},
                     productListStorage.push(structure),
                     localStorage.setItem('productsMudi', productListStorage)
@@ -240,7 +242,7 @@ class MudiPixel{
 
             /** 7.1 verifyDate */
             verifyDate(){
-                const listProducts = JSON.parse(localStorage.getItem('productMudi'));
+                const listProducts = JSON.parse(localStorage.getItem('productsMudi'));
                 if(!listProducts){ console.log('retornamos') ; return}
 
                 const dateToday = this.date.split(' ')[0]
