@@ -149,7 +149,7 @@ class MudiPixel{
                     console.log(listProductStorage)
                     if(!listProductStorage) return;
                 
-                    const filter = listProductStorage.find( registry => productSKU == registry.sku );
+                    const filter = listProductStorage.find( registry => productSKU.trim() == registry.sku.trim() );
                     console.log('filter')
                     console.log(filter)
 
