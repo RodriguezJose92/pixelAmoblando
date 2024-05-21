@@ -180,7 +180,6 @@ class MudiPixel{
 
                     this.createDB();
                     this.createRegistryDB();
-                    this.readObjectDB();
 
                     this.interaction3D++;
                     this.verifyBtnAR();
