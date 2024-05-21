@@ -237,9 +237,10 @@ class MudiPixel{
             });
 
             this.DBMudiProducts.addEventListener('success',()=>{
+                console.log('accediendo a la base de datos indexada');
                 this.readObjectDB();
                 this.createRegistryDB();
-                console.log('accediendo a la base de datos indexada');
+                
             });
 
             this.DBMudiProducts.addEventListener('error',()=>{
@@ -257,9 +258,9 @@ class MudiPixel{
 
             /** 7.2 DeleteRegistry because date */
             deleteRegistryDB(key){
-                const db            = this.DBMudiProducts.result;
-                const sku           = db.transaction('products','readwrite');
-                const objectStore   = sku.objectStore('products');
+                const db              = this.DBMudiProducts.result;
+                const __sku           = db.transaction('products','readwrite');
+                const objectStore     = __sku.objectStore('products');
                 objectStore.delete(key);
             };
 
@@ -277,12 +278,12 @@ class MudiPixel{
                     };
                 };
     
-                const db            = this.DBMudiProducts.result;
-                const sku           = db.transaction('products','readonly');
-                const objectStore   = sku.objectStore('products');
-                const 
-                cursor        = objectStore.openCursor();
+                const db             = this.DBMudiProducts.result;
+                const _sku           = db.transaction('products','readonly');
+                const objectStore    = _sku.objectStore('products');
 
+                const 
+                cursor = objectStore.openCursor();
                 cursor.addEventListener("success",()=>{
 
                     if (cursor.result){
