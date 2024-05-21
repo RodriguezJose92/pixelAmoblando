@@ -34,9 +34,6 @@ class MudiPixel{
         this.btnARVerify                    = 0; //✔️
         this.verifySkuNumber                = 0; //✔️
 
-        /** IndexDataBase */
-        this.DBMudiProducts                 = null;
-
     };
 
     /** Build Test AB */
@@ -132,35 +129,29 @@ class MudiPixel{
                 console.log("%cMudi Pixel: \n","color:#820ad1; font-weight:600","Purchase Correctly setting 🚀" ) ) 
             : ( requestAnimationFrame(this.verifyPurchase.bind(this)) , this.verifyPurchaseButton++  );
         };
+
             /** 3.1 Verify interaction with products 3D Experience */
             verifyproductInteractive3D(){
                 
-                const allProductsSkus = document.body.querySelectorAll('.media-content-details')
+                const allProductsSkus = document.body.querySelectorAll('.media-content-details');
+                let arrayList = [];
 
                 for(let i = 0; i<allProductsSkus.length; i++){
 
-                    /** Get SKU NUMBER Cars product to Pay */
+                    /** Get SKU NUMBER --- Cards product to Pay */
                     let productSKU = allProductsSkus[i].querySelector('.col-xs-10').innerHTML;
 
-                    /** Open indexDB */
-                    const db            = this.DBMudiProducts.result;
-                    const sku           = db.transaction('products','readonly');
-                    const objectStore   = sku.objectStore('products');
-                    const 
-                    cursor              = objectStore.openCursor();
-                    let array = [];
-        
-                    cursor.addEventListener("success",()=>{
-                        if(cursor.result){
-                            productSKU == cursor.result.value.sku && array.push(productSKU) 
-                            cursor.result.continue();
-                        }else console.log('consulta realizada');
-                    });
+                    const listProductStorage = JSON.parse(localStorage.getItem('productMudi'));
+                    if(!listProductStorage) return;
+                
+                    const filter = listProductStorage.find( registry => productSKU == registry.sku );
+                    if(!filter) return;
 
-                    this.skuNumber=array;
+                    arrayList.push(filter);                   
                 };
-            };
 
+                this.skuNumber = arrayList
+            };
             
         /** 4. Verify container Btns Mudi PDP ✔️ */
         verifyContainerBtnsMudi(){
@@ -177,11 +168,9 @@ class MudiPixel{
             ? ( 
                 this.viewerEvent ++ , 
                 document.body.querySelector('.btnMudi3D').addEventListener('click',()=>{
-
-                    this.createDB();
-
                     this.interaction3D++;
                     this.verifyBtnAR();
+                    this.verifyDataProducst();
                 }) ,
                 console.log("%cMudi Pixel: \n","color:#820ad1; font-weight:600","Container Btns Mudi Correctly setting 🚀" ) ) 
             : ( requestAnimationFrame(this.verifyContainerBtnsMudi.bind(this)) , this.verifyContainerMudiBtns ++  );
@@ -227,98 +216,36 @@ class MudiPixel{
 
         };
 
+        /** 7. Verify product Exist */
+        verifyDataProducst(){
+            let productListStorage = JSON.parse( localStorage.getItem('productMudi') );
+            const filter = () => !productListStorage ? {} : productListStorage.find( registry => this.skuNumber == registry.sku)
 
-        /** 7. Create Registry and DBIndexed Mudi */
-        createDB(){
+            switch ( filter() ){
+                case {}:
+                    productListStorage = [{"sku": this.skuNumber, "fechaCreacion": this.date}],
+                    localStorage.setItem('productsMudi', productListStorage)
+                    break;
+                case undefined :
+                    structure = {"sku":this.skuNumber, "fechaCreacion": this.date},
+                    productListStorage.push(structure),
+                    localStorage.setItem('productsMudi', productListStorage)
+                    break;
+            };
 
-            this.DBMudiProducts = indexedDB.open('productsMudi', 1);
-
-            this.DBMudiProducts.addEventListener('upgradeneeded',()=>{
-                let resultRequest = DBMudiProducts.result;
-                resultRequest.createObjectStore('products',{autoIncrement:true});
-            });
-
-            this.DBMudiProducts.addEventListener('success',()=>{
-                console.log('accediendo a la base de datos indexada');
-                this.createRegistryDB();
-                this.readObjectDB();                
-            });
-
-            this.DBMudiProducts.addEventListener('error',()=>{
-                throw new Error('No pudimos abrir ni crear la base de datos del pixel de Mudi')
-            });
-            
+            this.verifyDate()
         };
-            /** 7.1 Create registyDB */
-            createRegistryDB(){
 
-                this.DBMudiProducts = indexedDB.open('productsMudi', 1);
+            /** 7.1 verifyDate */
+            verifyDate(){
+                const listProducts = JSON.parse(localStorage.getItem('productMudi'));
+                const dateToday = this.date.split(' ')[0]
 
-                this.DBMudiProducts.addEventListener('upgradeneeded',()=>{
-                    let resultRequest = DBMudiProducts.result;
-                    resultRequest.createObjectStore('products',{autoIncrement:true});
+                const result = listProducts.filter(registry =>{
+                    let dateRegistry = registry.fechaCreacion.split(' ')[0];
+                    if ( dateToday == dateRegistry ) return result
                 });
-
-                this.DBMudiProducts.addEventListener('success',()=>{
-                    const db            = this.DBMudiProducts.result;
-                    const sku           = db.transaction('products','readwrite');
-                    const objectStore   = sku.objectStore('products');
-                    objectStore.add({"sku": this.skuNumber , "fechaCreacion": this.date });        
-                })
-
-                
-            };
-
-            /** 7.2 DeleteRegistry because date */
-            deleteRegistryDB(key){
-
-                this.DBMudiProducts = indexedDB.open('productsMudi', 1);
-
-                this.DBMudiProducts.addEventListener('upgradeneeded',()=>{
-                    let resultRequest = DBMudiProducts.result;
-                    resultRequest.createObjectStore('products',{autoIncrement:true});
-                });
-
-                this.DBMudiProducts.addEventListener('success',()=>{
-                    const db              = this.DBMudiProducts.result;
-                    const __sku           = db.transaction('products','readwrite');
-                    const objectStore     = __sku.objectStore('products');
-                    objectStore.delete(key);
-                });
-               
-            };
-
-            /** 7.3 Read Info productsMudi */
-            readObjectDB(){
-
-                const verifydate = (dateMudi,key) =>{
-                    const _getYear = new Date().getFullYear()
-                    const _getMonth = new Date().getMonth()+1;
-                    const _getday = new Date().getDate();
-                    const DateMudi = dateMudi.split(' ')[0].split('-');
-
-                    if(_getYear > DateMudi[0] || _getMonth > DateMudi[1] || _getday > DateMudi[2]){
-                        this.deleteRegistryDB(key)
-                    };
-                };
-    
-                const db             = this.DBMudiProducts.result;
-                const _sku           = db.transaction('products','readonly');
-                const objectStore    = _sku.objectStore('products');
-
-                const 
-                cursor = objectStore.openCursor();
-                cursor.addEventListener("success",()=>{
-
-                    if (cursor.result){
-                        verifydate(cursor.result.value.fechaCreacion , cursor.result.key);
-                        cursor.result.continue();
-                    }else{
-                        console.log('consulta realizada')
-                    };
-                    
-                })
-    
+                localStorage.setItem('productsMudi', listProducts)
             };
 
 
