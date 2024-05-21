@@ -218,7 +218,7 @@ class MudiPixel{
 
         /** 7. Verify product Exist */
         verifyDataProducst(){
-            let productListStorage = JSON.parse( localStorage.getItem('productMudi') );
+            let productListStorage = JSON.parse( localStorage.getItem('productMudi') ) , structure;
             const filter = () => !productListStorage ? {} : productListStorage.find( registry => this.skuNumber == registry.sku)
 
             switch ( filter() ){
