@@ -179,8 +179,6 @@ class MudiPixel{
                 document.body.querySelector('.btnMudi3D').addEventListener('click',()=>{
 
                     this.createDB();
-                    this.readObjectDB();
-                    this.createRegistryDB();
 
                     this.interaction3D++;
                     this.verifyBtnAR();
@@ -239,7 +237,9 @@ class MudiPixel{
             });
 
             this.DBMudiProducts.addEventListener('success',()=>{
-                console.log('Todo salió bien')
+                this.readObjectDB();
+                this.createRegistryDB();
+                console.log('accediendo a la base de datos indexada');
             });
 
             this.DBMudiProducts.addEventListener('error',()=>{
