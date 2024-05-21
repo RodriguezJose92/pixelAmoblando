@@ -221,6 +221,8 @@ class MudiPixel{
             let productListStorage = JSON.parse( localStorage.getItem('productMudi') ) , structure;
             const filter = () => !productListStorage ? {} : productListStorage.find( registry => this.skuNumber == registry.sku)
 
+            console.log(filter())
+
             switch ( filter() ){
                 case {}:
                     productListStorage = [{"sku": this.skuNumber, "fechaCreacion": this.date}],
@@ -239,6 +241,8 @@ class MudiPixel{
             /** 7.1 verifyDate */
             verifyDate(){
                 const listProducts = JSON.parse(localStorage.getItem('productMudi'));
+                if(!listProducts){ console.log('retornamos') ; return}
+
                 const dateToday = this.date.split(' ')[0]
 
                 const result = listProducts.filter(registry =>{
