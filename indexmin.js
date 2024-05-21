@@ -124,8 +124,7 @@ class MudiPixel{
 
             /** Add Event Purchase || Resend  */
             purchaseBtn 
-            ? ( purchaseBtn.addEventListener('click',()=> this.purchaseClick ++) , 
-                this.verifyproductInteractive3D(),
+            ? ( purchaseBtn.addEventListener('click',()=> { this.purchaseClick ++ ; this.verifyproductInteractive3D() }) , 
                 console.log("%cMudi Pixel: \n","color:#820ad1; font-weight:600","Purchase Correctly setting 🚀" ) ) 
             : ( requestAnimationFrame(this.verifyPurchase.bind(this)) , this.verifyPurchaseButton++  );
         };
