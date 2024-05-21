@@ -225,15 +225,18 @@ class MudiPixel{
 
             switch ( filter() ){
                 case null:
-                    console.log('creando localStorage')
-                    productListStorage = [{"sku": this.skuNumber, "fechaCreacion": this.date}],
-                    localStorage.setItem('productsMudi', JSON.stringify(productListStorage))
+                    productListStorage = [{"sku": this.skuNumber, "fechaCreacion": this.date}];
+                    localStorage.setItem('productsMudi', JSON.stringify(productListStorage));
                     break;
                 case undefined :
-                    console.log('agergando producto')
-                    structure = {"sku":this.skuNumber, "fechaCreacion": this.date},
-                    productListStorage.push(structure),
+                    structure = {"sku":this.skuNumber, "fechaCreacion": this.date};
+                    productListStorage.push(structure);
                     localStorage.setItem('productsMudi', JSON.stringify(productListStorage))
+                    break;
+                default :
+                    structure = {"sku":this.skuNumber, "fechaCreacion": this.date};
+                    productListStorage.push(structure);
+                    localStorage.setItem('productsMudi', JSON.stringify(productListStorage));
                     break;
             };
 
