@@ -259,10 +259,14 @@ class MudiPixel{
                     resultRequest.createObjectStore('products',{autoIncrement:true});
                 });
 
-                const db            = this.DBMudiProducts.result;
-                const sku           = db.transaction('products','readwrite');
-                const objectStore   = sku.objectStore('products');
-                objectStore.add({"sku": this.skuNumber , "fechaCreacion": this.date });        
+                this.DBMudiProducts.addEventListener('success',()=>{
+                    const db            = this.DBMudiProducts.result;
+                    const sku           = db.transaction('products','readwrite');
+                    const objectStore   = sku.objectStore('products');
+                    objectStore.add({"sku": this.skuNumber , "fechaCreacion": this.date });        
+                })
+
+                
             };
 
             /** 7.2 DeleteRegistry because date */
@@ -275,10 +279,13 @@ class MudiPixel{
                     resultRequest.createObjectStore('products',{autoIncrement:true});
                 });
 
-                const db              = this.DBMudiProducts.result;
-                const __sku           = db.transaction('products','readwrite');
-                const objectStore     = __sku.objectStore('products');
-                objectStore.delete(key);
+                this.DBMudiProducts.addEventListener('success',()=>{
+                    const db              = this.DBMudiProducts.result;
+                    const __sku           = db.transaction('products','readwrite');
+                    const objectStore     = __sku.objectStore('products');
+                    objectStore.delete(key);
+                });
+               
             };
 
             /** 7.3 Read Info productsMudi */
