@@ -134,6 +134,7 @@ class MudiPixel{
             verifyproductInteractive3D(){
                 
                 const allProductsSkus = document.body.querySelectorAll('.media-content-details');
+                if( allProductsSkus.length == 0){requestAnimationFrame(this.verifyproductInteractive3D.bind(this))};
                 let arrayList = [];
 
                 for(let i = 0; i<allProductsSkus.length; i++){
@@ -150,7 +151,7 @@ class MudiPixel{
                     arrayList.push(filter);                   
                 };
 
-                this.skuNumber = arrayList
+                this.skuNumber = JSON.stringify(arrayList)
             };
             
         /** 4. Verify container Btns Mudi PDP ✔️ */
@@ -221,8 +222,6 @@ class MudiPixel{
             let productListStorage = JSON.parse( localStorage.getItem('productsMudi') ) , structure;
             const filter = () => !productListStorage ? null : productListStorage.find( registry => this.skuNumber == registry.sku)
 
-            console.log(filter())
-
             switch ( filter() ){
                 case null:
                     productListStorage = [{"sku": this.skuNumber, "fechaCreacion": this.date}];
@@ -246,7 +245,7 @@ class MudiPixel{
             /** 7.1 verifyDate */
             verifyDate(){
                 const listProducts = JSON.parse(localStorage.getItem('productsMudi'));
-                if(!listProducts){ console.log('retornamos') ; return}
+                if(!listProducts){return}
 
                 const dateToday = this.date.split(' ')[0]
 
