@@ -227,13 +227,13 @@ class MudiPixel{
                 case null:
                     console.log('creando localStorage')
                     productListStorage = [{"sku": this.skuNumber, "fechaCreacion": this.date}],
-                    localStorage.setItem('productsMudi', productListStorage)
+                    localStorage.setItem('productsMudi', JSON.stringify(productListStorage))
                     break;
                 case undefined :
                     console.log('agergando producto')
                     structure = {"sku":this.skuNumber, "fechaCreacion": this.date},
                     productListStorage.push(structure),
-                    localStorage.setItem('productsMudi', productListStorage)
+                    localStorage.setItem('productsMudi', JSON.stringify(productListStorage))
                     break;
             };
 
@@ -251,7 +251,7 @@ class MudiPixel{
                     let dateRegistry = registry.fechaCreacion.split(' ')[0];
                     if ( dateToday == dateRegistry ) return result
                 });
-                localStorage.setItem('productsMudi', listProducts)
+                localStorage.setItem('productsMudi', JSON.stringify(listProducts))
             };
 
 
