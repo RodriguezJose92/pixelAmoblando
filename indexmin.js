@@ -251,7 +251,7 @@ class MudiPixel{
                     let dateRegistry = registry.fechaCreacion.split(' ')[0];
                     if ( dateToday == dateRegistry ) return registry
                 });
-                localStorage.setItem('productsMudi', JSON.stringify(listProducts))
+                localStorage.setItem('productsMudi', JSON.stringify(result))
             };
 
 
