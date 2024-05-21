@@ -139,6 +139,8 @@ class MudiPixel{
 
                 for(let i = 0; i<allProductsSkus.length; i++){
 
+                    console.log('estoy haciendo algo')
+
                     /** Get SKU NUMBER --- Cards product to Pay */
                     let productSKU = allProductsSkus[i].querySelector('.col-xs-10').innerHTML;
 
@@ -150,7 +152,7 @@ class MudiPixel{
 
                     arrayList.push(filter);                   
                 };
-                
+
                 console.log(arrayList);
                 this.skuNumber = JSON.stringify(arrayList)
             };
