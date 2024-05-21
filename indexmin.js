@@ -35,7 +35,7 @@ class MudiPixel{
         this.verifySkuNumber                = 0; //✔️
 
         /** IndexDataBase */
-        this.DBMudiProducts                 = indexedDB.open('productsMudi', 1);
+        this.DBMudiProducts                 = null;
 
     };
 
@@ -230,6 +230,8 @@ class MudiPixel{
 
         /** 7. Create Registry and DBIndexed Mudi */
         createDB(){
+
+            this.DBMudiProducts = indexedDB.open('productsMudi', 1);
 
             this.DBMudiProducts.addEventListener('upgradeneeded',()=>{
                 let resultRequest = DBMudiProducts.result;

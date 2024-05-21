@@ -35,7 +35,7 @@ class MudiPixel{
         this.verifySkuNumber                = 0; //✔️
 
         /** IndexDataBase */
-        this.DBMudiProducts                 = indexedDB.open('productsMudi', 1);
+        this.DBMudiProducts                 = null;
 
     };
 
