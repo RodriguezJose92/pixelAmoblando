@@ -240,9 +240,8 @@ class MudiPixel{
 
             this.DBMudiProducts.addEventListener('success',()=>{
                 console.log('accediendo a la base de datos indexada');
-                this.readObjectDB();
                 this.createRegistryDB();
-                
+                this.readObjectDB();                
             });
 
             this.DBMudiProducts.addEventListener('error',()=>{
