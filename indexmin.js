@@ -139,18 +139,24 @@ class MudiPixel{
 
                 for(let i = 0; i<allProductsSkus.length; i++){
 
-                    console.log('estoy haciendo algo')
-
                     /** Get SKU NUMBER --- Cards product to Pay */
                     let productSKU = allProductsSkus[i].querySelector('.col-xs-10').innerHTML;
+                    console.log('ProductoSKU')
+                    console.log(productSKU)
 
                     const listProductStorage = JSON.parse(localStorage.getItem('productsMudi'));
+                    console.log('listProductStorage')
+                    console.log(listProductStorage)
                     if(!listProductStorage) return;
                 
                     const filter = listProductStorage.find( registry => productSKU == registry.sku );
+                    console.log('filter')
+                    console.log(filter)
+
                     if(!filter) return;
 
-                    arrayList.push(filter);                   
+                    arrayList.push(filter);  
+                    console.log(arrayList)                 
                 };
 
                 console.log(arrayList);
