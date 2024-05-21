@@ -251,6 +251,14 @@ class MudiPixel{
         };
             /** 7.1 Create registyDB */
             createRegistryDB(){
+
+                this.DBMudiProducts = indexedDB.open('productsMudi', 1);
+
+                this.DBMudiProducts.addEventListener('upgradeneeded',()=>{
+                    let resultRequest = DBMudiProducts.result;
+                    resultRequest.createObjectStore('products',{autoIncrement:true});
+                });
+
                 const db            = this.DBMudiProducts.result;
                 const sku           = db.transaction('products','readwrite');
                 const objectStore   = sku.objectStore('products');
@@ -259,6 +267,14 @@ class MudiPixel{
 
             /** 7.2 DeleteRegistry because date */
             deleteRegistryDB(key){
+
+                this.DBMudiProducts = indexedDB.open('productsMudi', 1);
+
+                this.DBMudiProducts.addEventListener('upgradeneeded',()=>{
+                    let resultRequest = DBMudiProducts.result;
+                    resultRequest.createObjectStore('products',{autoIncrement:true});
+                });
+
                 const db              = this.DBMudiProducts.result;
                 const __sku           = db.transaction('products','readwrite');
                 const objectStore     = __sku.objectStore('products');
