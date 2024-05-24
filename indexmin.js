@@ -1,4 +1,4 @@
-class MudiPixel{
+⁸class MudiPixel{
 
     /** Builder OBJECT*/
     constructor(){
@@ -487,7 +487,6 @@ class MudiPixel{
 const 
 mudiPixel = new MudiPixel();
 window.mudiPixel = mudiPixel;
-mudiPixel.pixelMudiOn();
 
 
 /** https://www.toptal.com/developers/javascript-minifier */
