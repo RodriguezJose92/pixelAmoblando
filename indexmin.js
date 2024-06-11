@@ -447,9 +447,6 @@
 
         this.userID && (
 
-            /** Verify Testing AB */
-                this.verifyTestingAB(),
-
             /** DOM VERIFY */
 
                 /** Verify  add To Car */
