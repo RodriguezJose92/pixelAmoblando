@@ -1,4 +1,4 @@
-⁸class MudiPixel{
+class MudiPixel{
 
     /** Builder OBJECT*/
     constructor(){
