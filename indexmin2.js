@@ -132,34 +132,6 @@ class MudiPixel {
             : (requestAnimationFrame(this.verifyPurchase.bind(this)), this.verifyPurchaseButton++);
     };
 
-    /** 3.1 Verify interaction with products 3D Experience ❌*/
-    verifyproductInteractive3D() {
-
-        const allProductsSkus = document.body.querySelectorAll('.media-content-details')
-
-        for (let i = 0; i < allProductsSkus.length; i++) {
-
-            /** Get SKU NUMBER Cars product to Pay */
-            let productSKU = allProductsSkus[i].querySelector('.col-xs-10').innerHTML;
-
-            /** Open indexDB */
-            const db = this.DBMudiProducts.result;
-            const sku = db.transaction('products', 'readonly');
-            const objectStore = sku.objectStore('products');
-            const
-                cursor = objectStore.openCursor();
-            let array = [];
-
-            cursor.addEventListener("success", () => {
-                if (cursor.result) {
-                    productSKU == cursor.result.value.sku && array.push(productSKU)
-                    cursor.result.continue();
-                } else console.log('consulta realizada');
-            });
-
-            this.skuNumber = array;
-        };
-    };
 
 
     /** 4. Verify container Btns Mudi PDP ✔️ */
@@ -226,25 +198,6 @@ class MudiPixel {
                 this.skuNumber = skuContainer.getAttribute('skunumber'),
                 console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "SkuNumber Correctly setting 🚀"))
             : (requestAnimationFrame(this.verifySku.bind(this)), this.verifySkuNumber++);
-
-    };
-
-
-    /** 7. Create Registry and DBIndexed Mudi ❌ */
-    createDB() {
-
-        this.DBMudiProducts.addEventListener('upgradeneeded', () => {
-            let resultRequest = DBMudiProducts.result;
-            resultRequest.createObjectStore('products', { autoIncrement: true });
-        });
-
-        this.DBMudiProducts.addEventListener('success', () => {
-            console.log('Todo salió bien')
-        });
-
-        this.DBMudiProducts.addEventListener('error', () => {
-            throw new Error('No pudimos abrir ni crear la base de datos del pixel de Mudi')
-        });
 
     };
 
