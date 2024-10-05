@@ -495,32 +495,35 @@ class MudiPixel {
 
         );
 
-        if (location.pathname == '/checkout') {
+        if (location.pathname === '/checkout') {
 
-
-            const toalprodcutos = document.querySelectorAll('.media');
-            let name, sku, cantidad;
-
-            toalprodcutos.forEach(node => {
-                name = node.querySelector('.media-heading').innerHTML;
-                sku = node.querySelector('.media-content-details').children[1].innerHTML;
-                cantidad = node.querySelector('.media-content-details').children[5].innerHTML;
-            })
-
-            const total = document.getElementById('data-total').innerHTML.replace('$', '');
-
-            document.body.querySelector('.send-event-purchase').addEventListener('click', () => {
-                console.log( "Datos enviados correctamente "+
-                    name,
-                    sku,
-                    cantidad,
-                    total 
-                )
-                /** Toca mirar si toca mandarle parametros o no  */
-                this.sendDataProducts(name,sku,cantidad,total);
-            })
-
+            const totalProductos = document.querySelectorAll('.media');
+            let productos = [];
+        
+            totalProductos.forEach(node => {
+                const name = node.querySelector('.media-heading')?.innerHTML || 'Nombre no disponible';
+                const sku = node.querySelector('.media-content-details')?.children[1]?.innerHTML || 'SKU no disponible';
+                const cantidad = node.querySelector('.media-content-details')?.children[5]?.innerHTML || 'Cantidad no disponible';
+                
+                productos.push({ name, sku, cantidad });
+            });
+        
+            const total = document.getElementById('data-total')?.innerHTML.replace('$', '').trim() || 'Total no disponible';
+        
+            document.body.querySelector('.send-event-purchase')?.addEventListener('click', () => {
+                productos.forEach(producto => {
+                    console.log("Datos enviados correctamente: ",
+                        producto.name,
+                        producto.sku,
+                        producto.cantidad,
+                        total
+                    );
+                    /** Llamada a la función con los parámetros correctos */
+                    sendDataProducts(producto.name, producto.sku, producto.cantidad, total);
+                });
+            });
         }
+        
 
     };
 
