@@ -508,7 +508,7 @@ class MudiPixel {
                 productos.push({ name, sku, cantidad });
             });
         
-            const total = document.getElementById('data-total')?.innerHTML.replace('$', '').trim() || 'Total no disponible';
+            const total = document.getElementById('data-total')?.innerHTML.replace('$', '').replace(/\./g, '').trim() || 'Total no disponible';
         
             document.body.querySelector('.send-event-purchase')?.addEventListener('click', () => {
                 productos.forEach(producto => {
