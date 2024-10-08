@@ -1,4 +1,4 @@
-class MudiPixelTest {
+class MudiPixel {
 
     /** Builder OBJECT*/
     constructor() {
@@ -502,8 +502,8 @@ class MudiPixelTest {
                 const idCompany = this.idCompany
                 const name = node.querySelector('.media-heading').innerText || 'Nombre no disponible';
                 const sku = node.querySelector('.media-content-details').children[1].innerText || 'SKU no disponible';
-                const cantidadSelector = node.querySelector('.media-content-details').children[7].innerText 
-                const cantidad = Number.isNaN(parseInt(cantidadSelector)) ? 0 : cantidadSelector ;
+                const cantidadSelector = node.querySelector('.media-content-details').children[5].innerText || 0;
+                const cantidad = Number.isNaN(parseInt(cantidadSelector)) ? 0 : parseInt(cantidadSelector) ;
                 const total = document.querySelector('.media-price').innerHTML.replace('$', '').replace(/\./g, '').trim() || 'Total no disponible';
                 productos.push({ idCompany, name, sku, cantidad, total });
             });
@@ -518,6 +518,6 @@ class MudiPixelTest {
 
 };
 
-const mudiPixelTest = new MudiPixelTest();
-window.mudiPixelTest = mudiPixelTest;
-mudiPixelTest.pixelMudiOn();
+const mudiPixel = new MudiPixel();
+window.mudiPixel = mudiPixel;
+mudiPixel.pixelMudiOn();
