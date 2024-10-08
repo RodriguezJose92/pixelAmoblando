@@ -442,7 +442,7 @@ class MudiPixel {
             //     totalValue: total
 
             // };
-            const request = fetch('http://localhost:3589/api/mudiV1/dataProductsPurchase', {
+            const request = fetch('https://viewer.mudi.com.co:3589/api/mudiV1/dataProductsPurchase', {
                 method: 'POST',
                 headers: { "Content-type": "application/json" },
                 body: JSON.stringify(dataProducts)
@@ -502,7 +502,7 @@ class MudiPixel {
                 const idCompany = this.idCompany
                 const name = node.querySelector('.media-heading').innerText || 'Nombre no disponible';
                 const sku = node.querySelector('.media-content-details').children[1].innerText || 'SKU no disponible';
-                const cantidadSelector = node.querySelector('.media-content-details').children[5].innerText || 0;
+                const cantidadSelector = node.querySelector('.media-content-details').children[7]?.innerText || 0;
                 const cantidad = Number.isNaN(parseInt(cantidadSelector)) ? 0 : parseInt(cantidadSelector) ;
                 const total = document.querySelector('.media-price').innerHTML.replace('$', '').replace(/\./g, '').trim() || 'Total no disponible';
                 productos.push({ idCompany, name, sku, cantidad, total });
