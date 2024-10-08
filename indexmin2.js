@@ -444,7 +444,7 @@ class MudiPixel {
              
             };
 
-            const request = fetch('https://viewer.mudi.com.co:3589/api/mudiv1/dataProductsPurchase', {
+            const request = fetch('http://localhost:3589/api/mudiv1/dataProductsPurchase', {
                 method: 'POST',
                 headers: { "Content-type": "application/json" },
                 body: JSON.stringify(bodyToSend)
