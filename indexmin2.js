@@ -1,4 +1,4 @@
-class MudiPixel {
+class MudiPixelTest {
 
     /** Builder OBJECT*/
     constructor() {
@@ -161,7 +161,7 @@ class MudiPixel {
 
     };
 
-    /** 5. Verify btnAR Mudi PDP ❌ */
+    /** 5. Verify btnAR Mudi PDP ❌ YA NO SE ESTÁ USANDO */
     verifyBtnAR() {
 
         /** Declared DOM Container Btns*/
@@ -200,7 +200,7 @@ class MudiPixel {
 
     };
 
-    /** 7.1 Create registyDB */
+    /** 7.1 Create registyDB ❌ YA NO SE ESTÁ USANDO  */
     createRegistryDB() {
         const db = this.DBMudiProducts.result;
         const sku = db.transaction('products', 'readwrite');
@@ -208,7 +208,7 @@ class MudiPixel {
         objectStore.add({ "sku": this.skuNumber, "fechaCreacion": this.date });
     };
 
-    /** 7.2 DeleteRegistry because date */
+    /** 7.2 DeleteRegistry because date ❌ YA NO SE ESTÁ USANDO */
     deleteRegistryDB(key) {
         const db = this.DBMudiProducts.result;
         const sku = db.transaction('products', 'readwrite');
@@ -216,7 +216,7 @@ class MudiPixel {
         objectStore.delete(key);
     };
 
-    /** 7.3 Read Info productsMudi */
+    /** 7.3 Read Info productsMudi ❌ YA NO SE ESTÁ USANDO */
     readObjectDB() {
 
         const verifydate = (dateMudi, key) => {
@@ -432,24 +432,23 @@ class MudiPixel {
 
     };
 
-    sendDataProducts(name,sku,cantidad,total){
+    sendDataProducts(dataProducts) {
+        console.log(dataProducts)
         window.addEventListener('beforeunload', e => {
+            // let dataProducts = {
+            //     idCompany: this.idCompany,
+            //     nameProduct: name,
+            //     skuNumber: sku,
+            //     quantity: cantidad,
+            //     totalValue: total
 
-            let bodyToSend = {
-                idCompany: this.idCompany,
-                nameProduct: name,
-                skuNumber: sku,
-                quantity: cantidad,
-                totalValue:total       
-             
-            };
-
-            const request = fetch('http://localhost:3589/api/mudiv1/dataProductsPurchase', {
+            // };
+            const request = fetch('http://localhost:3589/api/mudiV1/dataProductsPurchase', {
                 method: 'POST',
                 headers: { "Content-type": "application/json" },
-                body: JSON.stringify(bodyToSend)
+                body: JSON.stringify(dataProducts)
             })
-
+            console.log(bodyToSend);
         })
 
     }
@@ -499,36 +498,26 @@ class MudiPixel {
 
             const totalProductos = document.querySelectorAll('.media');
             let productos = [];
-        
+
             totalProductos.forEach(node => {
+                const idCompany = this.idCompany
                 const name = node.querySelector('.media-heading')?.innerHTML || 'Nombre no disponible';
                 const sku = node.querySelector('.media-content-details')?.children[1]?.innerHTML || 'SKU no disponible';
                 const cantidad = node.querySelector('.media-content-details')?.children[5]?.innerHTML || 'Cantidad no disponible';
-                
-                productos.push({ name, sku, cantidad });
+                const total = document.querySelector('.media-price').innerHTML.replace('$', '').replace(/\./g, '').trim() || 'Total no disponible';
+                productos.push({ idCompany, name, sku, cantidad, total });
             });
+
         
-            const total = document.getElementById('data-total')?.innerHTML.replace('$', '').replace(/\./g, '').trim() || 'Total no disponible';
-        
-            document.body.querySelector('.send-event-purchase')?.addEventListener('click', () => {
-                productos.forEach(producto => {
-                    console.log("Datos enviados correctamente: ",
-                        producto.name,
-                        producto.sku,
-                        producto.cantidad,
-                        total
-                    );
-                    /** Llamada a la función con los parámetros correctos */
-                    sendDataProducts(producto.name, producto.sku, producto.cantidad, total);
-                });
+            document.body.querySelector('.send-event-purchase').addEventListener('click', () => {
+                this.sendDataProducts(productos);
             });
-        }
-        
+        };
 
     };
 
 };
 
-const mudiPixel = new MudiPixel();
-window.mudiPixel = mudiPixel;
-mudiPixel.pixelMudiOn();
+const mudiPixelTest = new MudiPixelTest();
+window.mudiPixelTest = mudiPixelTest;
+mudiPixelTest.pixelMudiOn();
