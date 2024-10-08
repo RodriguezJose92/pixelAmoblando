@@ -1,4 +1,4 @@
-class MudiPixel {
+class MudiPixelTest {
 
     /** Builder OBJECT*/
     constructor() {
@@ -127,10 +127,10 @@ class MudiPixel {
         /** Add Event Purchase || Resend  */
         purchaseBtn
             ? (purchaseBtn.addEventListener('click', () => this.purchaseClick++),
-                this.verifyproductInteractive3D(),
                 console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Purchase Correctly setting 🚀"))
             : (requestAnimationFrame(this.verifyPurchase.bind(this)), this.verifyPurchaseButton++);
     };
+
 
 
     /** 4. Verify container Btns Mudi PDP ✔️ */
@@ -161,7 +161,7 @@ class MudiPixel {
 
     };
 
-    /** 5. Verify btnAR Mudi PDP ❌ */
+    /** 5. Verify btnAR Mudi PDP ❌ YA NO SE ESTÁ USANDO */
     verifyBtnAR() {
 
         /** Declared DOM Container Btns*/
@@ -200,8 +200,7 @@ class MudiPixel {
 
     };
 
-
-    /** 7.1 Create registyDB */
+    /** 7.1 Create registyDB ❌ YA NO SE ESTÁ USANDO  */
     createRegistryDB() {
         const db = this.DBMudiProducts.result;
         const sku = db.transaction('products', 'readwrite');
@@ -209,7 +208,7 @@ class MudiPixel {
         objectStore.add({ "sku": this.skuNumber, "fechaCreacion": this.date });
     };
 
-    /** 7.2 DeleteRegistry because date */
+    /** 7.2 DeleteRegistry because date ❌ YA NO SE ESTÁ USANDO */
     deleteRegistryDB(key) {
         const db = this.DBMudiProducts.result;
         const sku = db.transaction('products', 'readwrite');
@@ -217,7 +216,7 @@ class MudiPixel {
         objectStore.delete(key);
     };
 
-    /** 7.3 Read Info productsMudi */
+    /** 7.3 Read Info productsMudi ❌ YA NO SE ESTÁ USANDO */
     readObjectDB() {
 
         const verifydate = (dateMudi, key) => {
@@ -433,24 +432,22 @@ class MudiPixel {
 
     };
 
-    sendDataProducts(name,sku,cantidad,total){
+    sendDataProducts(dataProducts) {
         window.addEventListener('beforeunload', e => {
+            // let dataProducts = {
+            //     idCompany: this.idCompany,
+            //     nameProduct: name,
+            //     skuNumber: sku,
+            //     quantity: cantidad,
+            //     totalValue: total
 
-            let bodyToSend = {
-                idCompany: this.idCompany,
-                nameProduct: name,
-                skuNumber: sku,
-                quantity: cantidad,
-                totalValue:total       
-             
-            };
-
-            const request = fetch('https://viewer.mudi.com.co:3589/api/mudiv1/dataProductsPurchase', {
+            // };
+            const request = fetch('http://localhost:3589/api/mudiV1/dataProductsPurchase', {
                 method: 'POST',
                 headers: { "Content-type": "application/json" },
-                body: JSON.stringify(bodyToSend)
+                body: JSON.stringify(dataProducts)
             })
-
+            console.log(bodyToSend);
         })
 
     }
@@ -496,37 +493,30 @@ class MudiPixel {
 
         );
 
-        if (location.pathname == '/checkout') {
+        if (location.pathname === '/checkout') {
 
+            const totalProductos = document.querySelectorAll('.media');
+            let productos = [];
 
-            const toalprodcutos = document.querySelectorAll('.media');
-            let name, sku, cantidad;
+            totalProductos.forEach(node => {
+                const idCompany = this.idCompany
+                const name = node.querySelector('.media-heading')?.innerHTML || 'Nombre no disponible';
+                const sku = node.querySelector('.media-content-details')?.children[1]?.innerHTML || 'SKU no disponible';
+                const cantidad = node.querySelector('.media-content-details')?.children[5]?.innerHTML || 'Cantidad no disponible';
+                const total = document.querySelector('.media-price').innerHTML.replace('$', '').replace(/\./g, '').trim() || 'Total no disponible';
+                productos.push({ idCompany, name, sku, cantidad, total });
+            });
 
-            toalprodcutos.forEach(node => {
-                name = node.querySelector('.media-heading').innerHTML;
-                sku = node.querySelector('.media-content-details').children[1].innerHTML;
-                cantidad = node.querySelector('.media-content-details').children[5].innerHTML;
-            })
-
-            const total = document.getElementById('data-total').innerHTML.replace('$', '');
-
+        
             document.body.querySelector('.send-event-purchase').addEventListener('click', () => {
-                console.log( "Datos enviados correctamente "+
-                    name,
-                    sku,
-                    cantidad,
-                    total 
-                )
-                /** Toca mirar si toca mandarle parametros o no  */
-                this.sendDataProducts(name,sku,cantidad,total);
-            })
-
-        }
+                this.sendDataProducts(productos);
+            });
+        };
 
     };
 
 };
 
-const mudiPixel = new MudiPixel();
-window.mudiPixel = mudiPixel;
-mudiPixel.pixelMudiOn();
+const mudiPixelTest = new MudiPixelTest();
+window.mudiPixelTest = mudiPixelTest;
+mudiPixelTest.pixelMudiOn();
