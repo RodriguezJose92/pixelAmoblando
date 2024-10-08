@@ -499,13 +499,15 @@ class MudiPixel {
             let productos = [];
 
             totalProductos.forEach(node => {
-                const idCompany = this.idCompany
+            
+                const idCompany = this.idCompany;
+                const path = this.path;
                 const name = node.querySelector('.media-heading').innerText || 'Nombre no disponible';
                 const sku = node.querySelector('.media-content-details').children[1].innerText || 'SKU no disponible';
                 const cantidadSelector = node.querySelector('.media-content-details').children[7]?.innerText || 0;
                 const cantidad = Number.isNaN(parseInt(cantidadSelector)) ? 0 : parseInt(cantidadSelector) ;
                 const total = document.querySelector('.media-price').innerHTML.replace('$', '').replace(/\./g, '').trim() || 'Total no disponible';
-                productos.push({ idCompany, name, sku, cantidad, total });
+                productos.push({ idCompany, path, name, sku, cantidad, total });
             });
 
         
