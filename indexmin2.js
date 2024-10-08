@@ -433,7 +433,6 @@ class MudiPixelTest {
     };
 
     sendDataProducts(dataProducts) {
-        console.log(dataProducts)
         window.addEventListener('beforeunload', e => {
             // let dataProducts = {
             //     idCompany: this.idCompany,
@@ -501,9 +500,10 @@ class MudiPixelTest {
 
             totalProductos.forEach(node => {
                 const idCompany = this.idCompany
-                const name = node.querySelector('.media-heading')?.innerHTML || 'Nombre no disponible';
-                const sku = node.querySelector('.media-content-details')?.children[1]?.innerHTML || 'SKU no disponible';
-                const cantidad = node.querySelector('.media-content-details')?.children[5]?.innerHTML || 'Cantidad no disponible';
+                const name = node.querySelector('.media-heading').innerText || 'Nombre no disponible';
+                const sku = node.querySelector('.media-content-details').children[1].innerText || 'SKU no disponible';
+                const cantidadSelector = node.querySelector('.media-content-details').children[7].innerText 
+                const cantidad = Number.isNaN(parseInt(cantidadSelector)) ? 0 : cantidadSelector ;
                 const total = document.querySelector('.media-price').innerHTML.replace('$', '').replace(/\./g, '').trim() || 'Total no disponible';
                 productos.push({ idCompany, name, sku, cantidad, total });
             });
