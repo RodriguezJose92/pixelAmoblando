@@ -148,12 +148,7 @@ class MudiPixel {
             ? (
                 this.viewerEvent++,
                 document.body.querySelector('.btnMudi3D').addEventListener('click', () => {
-
-                    this.readObjectDB();
-                    this.createRegistryDB();
-
                     this.interaction3D++;
-                    this.verifyBtnAR();
                 }),
                 console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Container Btns Mudi Correctly setting 🚀"))
             : (requestAnimationFrame(this.verifyContainerBtnsMudi.bind(this)), this.verifyContainerMudiBtns++);
