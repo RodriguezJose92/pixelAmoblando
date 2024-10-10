@@ -160,26 +160,7 @@ class MudiPixel {
 
     };
 
-    /** 5. Verify btnAR Mudi PDP ❌ YA NO SE ESTÁ USANDO */
-    verifyBtnAR() {
-
-        /** Declared DOM Container Btns*/
-        let
-            btnAR = document.body.querySelector(`.imgBtnAR`), // CUSTOM ELEMENT btn AR
-            flagControl = false;
-
-        /** End process verify  */
-        if (this.btnARVerify > 1500) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "Btn Ar mode was not found ❌"); return false };
-
-        /** Add Evento addToCar || Resend  */
-        btnAR
-            ? (
-                btnAR.addEventListener('click', () => !flagControl ? (flagControl = !flagControl, this.interactionAR++) : (flagControl = !flagControl)),
-                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Btn AR mode Correctly setting 🚀"))
-            : (requestAnimationFrame(this.verifyBtnAR.bind(this)), this.btnARVerify++);
-
-    };
-
+   
     /** 6. Verify SKUNumber ✔️*/
     verifySku() {
 
@@ -196,55 +177,6 @@ class MudiPixel {
                 this.skuNumber = skuContainer.getAttribute('skunumber'),
                 console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "SkuNumber Correctly setting 🚀"))
             : (requestAnimationFrame(this.verifySku.bind(this)), this.verifySkuNumber++);
-
-    };
-
-    /** 7.1 Create registyDB ❌ YA NO SE ESTÁ USANDO  */
-    createRegistryDB() {
-        const db = this.DBMudiProducts.result;
-        const sku = db.transaction('products', 'readwrite');
-        const objectStore = sku.objectStore('products');
-        objectStore.add({ "sku": this.skuNumber, "fechaCreacion": this.date });
-    };
-
-    /** 7.2 DeleteRegistry because date ❌ YA NO SE ESTÁ USANDO */
-    deleteRegistryDB(key) {
-        const db = this.DBMudiProducts.result;
-        const sku = db.transaction('products', 'readwrite');
-        const objectStore = sku.objectStore('products');
-        objectStore.delete(key);
-    };
-
-    /** 7.3 Read Info productsMudi ❌ YA NO SE ESTÁ USANDO */
-    readObjectDB() {
-
-        const verifydate = (dateMudi, key) => {
-            const _getYear = new Date().getFullYear()
-            const _getMonth = new Date().getMonth() + 1;
-            const _getday = new Date().getDate();
-            const DateMudi = dateMudi.split(' ')[0].split('-');
-
-            if (_getYear > DateMudi[0] || _getMonth > DateMudi[1] || _getday > DateMudi[2]) {
-                this.deleteRegistryDB(key)
-            };
-        };
-
-        const db = this.DBMudiProducts.result;
-        const sku = db.transaction('products', 'readonly');
-        const objectStore = sku.objectStore('products');
-        const
-            cursor = objectStore.openCursor();
-
-        cursor.addEventListener("success", () => {
-
-            if (cursor.result) {
-                verifydate(cursor.result.value.fechaCreacion, cursor.result.key);
-                cursor.result.continue();
-            } else {
-                console.log('consulta realizada')
-            };
-
-        })
 
     };
 
