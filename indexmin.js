@@ -18,9 +18,12 @@ class MudiPixel {
         this.viewerEvent = 0;               //✔️
         this.interaction3D = 0;             //✔️
         this.interactionAR = 0;             //✔️
+        this.interaction3Dplp = 0;       //✔️
+        this.interactionDetails = 0;     //✔️ 
 
         this.addToCar = 0;                  //✔️
         this.purchaseClick = 0;             //✔️
+
 
         /** Element DOM Verify and SEND */
         this.category = null;               //✔️✔️
@@ -28,6 +31,8 @@ class MudiPixel {
 
         /** VerifyDoms -- Counters */
         this.verifyAddToCarButton = 0;      //✔️
+        this.verifyButtonPlp = 0;           //✔️
+        this.verifyButtonDetails = 0;       //✔️
         this.verifyBreadcrumb = 0;          //✔️
         this.verifyPurchaseButton = 0;      //✔️
         this.verifyContainerMudiBtns = 0;   //✔️
@@ -131,8 +136,6 @@ class MudiPixel {
             : (requestAnimationFrame(this.verifyPurchase.bind(this)), this.verifyPurchaseButton++);
     };
 
-
-
     /** 4. Verify container Btns Mudi PDP ✔️ */
     verifyContainerBtnsMudi() {
 
@@ -148,36 +151,10 @@ class MudiPixel {
             ? (
                 this.viewerEvent++,
                 document.body.querySelector('.btnMudi3D').addEventListener('click', () => {
-
-                    this.createDB();
-                    this.readObjectDB();
-                    this.createRegistryDB();
-
                     this.interaction3D++;
-                    this.verifyBtnAR();
                 }),
                 console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Container Btns Mudi Correctly setting 🚀"))
             : (requestAnimationFrame(this.verifyContainerBtnsMudi.bind(this)), this.verifyContainerMudiBtns++);
-
-    };
-
-    /** 5. Verify btnAR Mudi PDP ❌ YA NO SE ESTÁ USANDO */
-    verifyBtnAR() {
-
-        /** Declared DOM Container Btns*/
-        let
-            btnAR = document.body.querySelector(`.imgBtnAR`), // CUSTOM ELEMENT btn AR
-            flagControl = false;
-
-        /** End process verify  */
-        if (this.btnARVerify > 1500) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "Btn Ar mode was not found ❌"); return false };
-
-        /** Add Evento addToCar || Resend  */
-        btnAR
-            ? (
-                btnAR.addEventListener('click', () => !flagControl ? (flagControl = !flagControl, this.interactionAR++) : (flagControl = !flagControl)),
-                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Btn AR mode Correctly setting 🚀"))
-            : (requestAnimationFrame(this.verifyBtnAR.bind(this)), this.btnARVerify++);
 
     };
 
@@ -200,52 +177,43 @@ class MudiPixel {
 
     };
 
-    /** 7.1 Create registyDB ❌ YA NO SE ESTÁ USANDO  */
-    createRegistryDB() {
-        const db = this.DBMudiProducts.result;
-        const sku = db.transaction('products', 'readwrite');
-        const objectStore = sku.objectStore('products');
-        objectStore.add({ "sku": this.skuNumber, "fechaCreacion": this.date });
+    /** 1. Verify button plp ✔️ */
+    verifyInteractionPLP() {
+
+        /** Declared DOM Element */
+        let
+            elements = document.querySelectorAll('.iconCatMudi_3D'); // CUSTOM ELEMENT ✔️
+
+        /** End process verify  */
+        if (this.verifyButtonPlp > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The Button 3D was not found ❌"); return false; };
+
+        elements.forEach(element => {
+            element.addEventListener('click', () => {
+                console.log("Click "+this.interaction3Dplp);
+                 this.interaction3Dplp++
+             })
+             console.log(element);
+             
+        });
+
+
     };
 
-    /** 7.2 DeleteRegistry because date ❌ YA NO SE ESTÁ USANDO */
-    deleteRegistryDB(key) {
-        const db = this.DBMudiProducts.result;
-        const sku = db.transaction('products', 'readwrite');
-        const objectStore = sku.objectStore('products');
-        objectStore.delete(key);
-    };
+    /** 1. Verify button details ✔️ */
+    verifyInteractionDetails() {
 
-    /** 7.3 Read Info productsMudi ❌ YA NO SE ESTÁ USANDO */
-    readObjectDB() {
+        /** Declared DOM Element */
+        let
+            element = document.body.querySelector(`.goToSite3D`); // CUSTOM ELEMENT ✔️
 
-        const verifydate = (dateMudi, key) => {
-            const _getYear = new Date().getFullYear()
-            const _getMonth = new Date().getMonth() + 1;
-            const _getday = new Date().getDate();
-            const DateMudi = dateMudi.split(' ')[0].split('-');
+        /** End process verify  */
+        if (this.verifyButtonDetails > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The button more details was not found ❌"); return false; };
 
-            if (_getYear > DateMudi[0] || _getMonth > DateMudi[1] || _getday > DateMudi[2]) {
-                this.deleteRegistryDB(key)
-            };
-        };
-
-        const db = this.DBMudiProducts.result;
-        const sku = db.transaction('products', 'readonly');
-        const objectStore = sku.objectStore('products');
-        const
-            cursor = objectStore.openCursor();
-
-        cursor.addEventListener("success", () => {
-
-            if (cursor.result) {
-                verifydate(cursor.result.value.fechaCreacion, cursor.result.key);
-                cursor.result.continue();
-            } else {
-                console.log('consulta realizada')
-            };
-
-        })
+        /** Add Evento addToCar || Resend  */
+        element
+            ? (element.parentNode.addEventListener('click', () => this.interactionDetails++),
+                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "button more details Correctly setting 🚀"))
+            : (requestAnimationFrame(this.verifyInteractionDetails.bind(this)), this.verifyButtonDetails++);
 
     };
 
@@ -419,7 +387,9 @@ class MudiPixel {
                 subCategory: this.subCategory,
                 skuNumber: this.skuNumber,
                 idCompany: this.idCompany,
-                testType: this.testType
+                testType: this.testType,
+                interaction3Dplp: this.interaction3Dplp,
+                interactionDetails: this.interactionDetails
             };
 
             const request = fetch('https://viewer.mudi.com.co:3589/api/mudiv1/registryPixelMudi', {
@@ -474,8 +444,11 @@ class MudiPixel {
             /** Verify Ourchase */
             this.verifyPurchase(),
 
+
             /** Verify PDP 3D Btn And Evetns interaction 3D  & AR  */
             this.verifyContainerBtnsMudi(),
+            this.verifyInteractionPLP(),
+            this.verifyInteractionDetails(),
 
             /** INFO GENERAL  */
 
@@ -499,18 +472,18 @@ class MudiPixel {
             let productos = [];
 
             totalProductos.forEach(node => {
-            
+
                 const idCompany = this.idCompany;
                 const path = this.path;
                 const name = node.querySelector('.media-heading').innerText || 'Nombre no disponible';
                 const sku = node.querySelector('.media-content-details').children[1].innerText || 'SKU no disponible';
                 const cantidadSelector = node.querySelector('.media-content-details').children[7]?.innerText || 0;
-                const cantidad = Number.isNaN(parseInt(cantidadSelector)) ? 0 : parseInt(cantidadSelector) ;
+                const cantidad = Number.isNaN(parseInt(cantidadSelector)) ? 0 : parseInt(cantidadSelector);
                 const total = document.querySelector('.media-price').innerHTML.replace('$', '').replace(/\./g, '').trim() || 'Total no disponible';
                 productos.push({ idCompany, path, name, sku, cantidad, total });
             });
 
-        
+
             document.body.querySelector('.send-event-purchase').addEventListener('click', () => {
                 this.sendDataProducts(productos);
             });
