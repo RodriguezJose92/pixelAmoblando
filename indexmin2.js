@@ -18,9 +18,12 @@ class MudiPixel {
         this.viewerEvent = 0;               //✔️
         this.interaction3D = 0;             //✔️
         this.interactionAR = 0;             //✔️
+        this.interaction3Dplp = null;       //✔️
+        this.interactionDetails = null;     //✔️ 
 
         this.addToCar = 0;                  //✔️
         this.purchaseClick = 0;             //✔️
+
 
         /** Element DOM Verify and SEND */
         this.category = null;               //✔️✔️
@@ -28,6 +31,8 @@ class MudiPixel {
 
         /** VerifyDoms -- Counters */
         this.verifyAddToCarButton = 0;      //✔️
+        this.verifyButtonPlp = 0;           //✔️
+        this.verifyButtonDetails = 0;       //✔️
         this.verifyBreadcrumb = 0;          //✔️
         this.verifyPurchaseButton = 0;      //✔️
         this.verifyContainerMudiBtns = 0;   //✔️
@@ -131,8 +136,6 @@ class MudiPixel {
             : (requestAnimationFrame(this.verifyPurchase.bind(this)), this.verifyPurchaseButton++);
     };
 
-
-
     /** 4. Verify container Btns Mudi PDP ✔️ */
     verifyContainerBtnsMudi() {
 
@@ -155,7 +158,6 @@ class MudiPixel {
 
     };
 
-   
     /** 6. Verify SKUNumber ✔️*/
     verifySku() {
 
@@ -174,6 +176,42 @@ class MudiPixel {
             : (requestAnimationFrame(this.verifySku.bind(this)), this.verifySkuNumber++);
 
     };
+
+      /** 1. Verify button plp ✔️ */
+      verifyInteractionPLP() {
+
+        /** Declared DOM Element */
+        let
+            element = document.body.querySelector(`.imgMundi`); // CUSTOM ELEMENT ✔️
+
+        /** End process verify  */
+        if (this.verifyButtonPlp > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The button to add to cart was not found ❌"); return false; };
+
+        /** Add Evento addToCar || Resend  */
+        element
+            ? (element.parentNode.addEventListener('click', () => this.interaction3Dplp++),
+                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Add To car Correctly setting 🚀"))
+            : (requestAnimationFrame(this.verifyInteractionPLP.bind(this)), this.verifyButtonPlp++);
+
+    };
+
+          /** 1. Verify button details ✔️ */
+          verifyInteractionDetails() {
+
+            /** Declared DOM Element */
+            let
+                element = document.body.querySelector(`.imgMundi`); // CUSTOM ELEMENT ✔️
+    
+            /** End process verify  */
+            if (this.verifyButtonDetails > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The button to add to cart was not found ❌"); return false; };
+    
+            /** Add Evento addToCar || Resend  */
+            element
+                ? (element.parentNode.addEventListener('click', () => this.interactionDetails++),
+                    console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Add To car Correctly setting 🚀"))
+                : (requestAnimationFrame(this.verifyInteractionPLP.bind(this)), this.verifyButtonDetails++);
+    
+        };
 
 
     /** Events info General */
@@ -345,7 +383,9 @@ class MudiPixel {
                 subCategory: this.subCategory,
                 skuNumber: this.skuNumber,
                 idCompany: this.idCompany,
-                testType: this.testType
+                testType: this.testType,
+                interaction3Dplp: this.interaction3Dplp,
+                interactionDetails :  this.interactionDetails
             };
 
             const request = fetch('https://viewer.mudi.com.co:3589/api/mudiv1/registryPixelMudi', {
@@ -400,8 +440,11 @@ class MudiPixel {
             /** Verify Ourchase */
             this.verifyPurchase(),
 
+
             /** Verify PDP 3D Btn And Evetns interaction 3D  & AR  */
             this.verifyContainerBtnsMudi(),
+            this.verifyButtonPlp(),
+            this.verifyButtonDetails(),
 
             /** INFO GENERAL  */
 
