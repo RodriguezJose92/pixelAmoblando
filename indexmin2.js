@@ -18,8 +18,8 @@ class MudiPixel {
         this.viewerEvent = 0;               //✔️
         this.interaction3D = 0;             //✔️
         this.interactionAR = 0;             //✔️
-        this.interaction3Dplp = null;       //✔️
-        this.interactionDetails = null;     //✔️ 
+        this.interaction3Dplp = 0;       //✔️
+        this.interactionDetails = 0;     //✔️ 
 
         this.addToCar = 0;                  //✔️
         this.purchaseClick = 0;             //✔️
@@ -177,41 +177,45 @@ class MudiPixel {
 
     };
 
-      /** 1. Verify button plp ✔️ */
-      verifyInteractionPLP() {
+    /** 1. Verify button plp ✔️ */
+    verifyInteractionPLP() {
 
         /** Declared DOM Element */
         let
-            element = document.body.querySelector(`.imgMundi`); // CUSTOM ELEMENT ✔️
+            elements = document.querySelectorAll('.iconCatMudi_3D'); // CUSTOM ELEMENT ✔️
 
         /** End process verify  */
-        if (this.verifyButtonPlp > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The button to add to cart was not found ❌"); return false; };
+        if (this.verifyButtonPlp > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The Button 3D was not found ❌"); return false; };
 
-        /** Add Evento addToCar || Resend  */
-        element
-            ? (element.parentNode.addEventListener('click', () => this.interaction3Dplp++),
-                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Add To car Correctly setting 🚀"))
-            : (requestAnimationFrame(this.verifyInteractionPLP.bind(this)), this.verifyButtonPlp++);
+        elements.forEach(element => {
+            element.addEventListener('click', () => {
+                console.log("Click "+this.interaction3Dplp);
+                 this.interaction3Dplp++
+             })
+             console.log(element);
+             
+        });
+
 
     };
 
-          /** 1. Verify button details ✔️ */
-          verifyInteractionDetails() {
+    /** 1. Verify button details ✔️ */
+    verifyInteractionDetails() {
 
-            /** Declared DOM Element */
-            let
-                element = document.body.querySelector(`.imgMundi`); // CUSTOM ELEMENT ✔️
-    
-            /** End process verify  */
-            if (this.verifyButtonDetails > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The button to add to cart was not found ❌"); return false; };
-    
-            /** Add Evento addToCar || Resend  */
-            element
-                ? (element.parentNode.addEventListener('click', () => this.interactionDetails++),
-                    console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Add To car Correctly setting 🚀"))
-                : (requestAnimationFrame(this.verifyInteractionPLP.bind(this)), this.verifyButtonDetails++);
-    
-        };
+        /** Declared DOM Element */
+        let
+            element = document.body.querySelector(`.goToSite3D`); // CUSTOM ELEMENT ✔️
+
+        /** End process verify  */
+        if (this.verifyButtonDetails > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The button more details was not found ❌"); return false; };
+
+        /** Add Evento addToCar || Resend  */
+        element
+            ? (element.parentNode.addEventListener('click', () => this.interactionDetails++),
+                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "button more details Correctly setting 🚀"))
+            : (requestAnimationFrame(this.verifyInteractionDetails.bind(this)), this.verifyButtonDetails++);
+
+    };
 
 
     /** Events info General */
@@ -385,7 +389,7 @@ class MudiPixel {
                 idCompany: this.idCompany,
                 testType: this.testType,
                 interaction3Dplp: this.interaction3Dplp,
-                interactionDetails :  this.interactionDetails
+                interactionDetails: this.interactionDetails
             };
 
             const request = fetch('https://viewer.mudi.com.co:3589/api/mudiv1/registryPixelMudi', {
@@ -443,8 +447,8 @@ class MudiPixel {
 
             /** Verify PDP 3D Btn And Evetns interaction 3D  & AR  */
             this.verifyContainerBtnsMudi(),
-            this.verifyButtonPlp(),
-            this.verifyButtonDetails(),
+            this.verifyInteractionPLP(),
+            this.verifyInteractionDetails(),
 
             /** INFO GENERAL  */
 
@@ -468,18 +472,18 @@ class MudiPixel {
             let productos = [];
 
             totalProductos.forEach(node => {
-            
+
                 const idCompany = this.idCompany;
                 const path = this.path;
                 const name = node.querySelector('.media-heading').innerText || 'Nombre no disponible';
                 const sku = node.querySelector('.media-content-details').children[1].innerText || 'SKU no disponible';
                 const cantidadSelector = node.querySelector('.media-content-details').children[7]?.innerText || 0;
-                const cantidad = Number.isNaN(parseInt(cantidadSelector)) ? 0 : parseInt(cantidadSelector) ;
+                const cantidad = Number.isNaN(parseInt(cantidadSelector)) ? 0 : parseInt(cantidadSelector);
                 const total = document.querySelector('.media-price').innerHTML.replace('$', '').replace(/\./g, '').trim() || 'Total no disponible';
                 productos.push({ idCompany, path, name, sku, cantidad, total });
             });
 
-        
+
             document.body.querySelector('.send-event-purchase').addEventListener('click', () => {
                 this.sendDataProducts(productos);
             });
