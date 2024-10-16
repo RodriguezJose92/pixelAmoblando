@@ -2,7 +2,7 @@ class MudiPixel {
 
     /** Builder OBJECT*/
     constructor() {
-
+ 
         /** General Info  */
         this.testType = null;
         this.userID = null;                 //✔️ 
@@ -18,8 +18,8 @@ class MudiPixel {
         this.viewerEvent = 0;               //✔️
         this.interaction3D = 0;             //✔️
         this.interactionAR = 0;             //✔️
-        this.interaction3Dplp = 0;       //✔️
-        this.interactionDetails = 0;     //✔️ 
+        this.interaction3Dplp = 0;          //✔️
+        this.interactionDetails = 0;        //✔️ 
 
         this.addToCar = 0;                  //✔️
         this.purchaseClick = 0;             //✔️
