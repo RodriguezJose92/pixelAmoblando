@@ -2,7 +2,7 @@ class MudiPixel {
 
     /** Builder OBJECT*/
     constructor() {
- 
+
         /** General Info  */
         this.testType = null;
         this.userID = null;                 //✔️ 
@@ -18,8 +18,8 @@ class MudiPixel {
         this.viewerEvent = 0;               //✔️
         this.interaction3D = 0;             //✔️
         this.interactionAR = 0;             //✔️
-        this.interaction3Dplp = 0;          //✔️
-        this.interactionDetails = 0;        //✔️ 
+        this.interaction3Dplp = 0;       //✔️
+        this.interactionDetails = 0;     //✔️ 
 
         this.addToCar = 0;                  //✔️
         this.purchaseClick = 0;             //✔️
@@ -48,7 +48,7 @@ class MudiPixel {
     async verifyTestingAB() {
 
         /** verify Test */
-        let testMudi = localStorage.getItem('UserMudiTest');
+        let testMudi = sessionStorage.getItem('UserMudiTest');
 
         if (testMudi !== null) { this.testType = testMudi }
         else {
@@ -80,7 +80,7 @@ class MudiPixel {
         })
 
         this.testType = testUpdate;
-        localStorage.setItem('UserMudiTest', testUpdate)
+        sessionStorage.setItem('UserMudiTest', testUpdate)
     };
 
     /** Events for DOM verification */
@@ -96,10 +96,15 @@ class MudiPixel {
         if (this.verifyAddToCarButton > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The button to add to cart was not found ❌"); return false; };
 
         /** Add Evento addToCar || Resend  */
-        element
-            ? (element.parentNode.addEventListener('click', () => this.addToCar++),
-                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Add To car Correctly setting 🚀"))
-            : (requestAnimationFrame(this.verifyAddToCar.bind(this)), this.verifyAddToCarButton++);
+        if (!element) {
+            requestAnimationFrame(this.verifyAddToCar.bind(this));
+            this.verifyAddToCarButton++;
+            return
+        }
+
+        element.parentNode.addEventListener('click', () => this.addToCar++);
+        this.skuNumber = document.querySelector(".btnsMudiContainer").getAttribute("skunumber");
+        console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Add To car Correctly setting 🚀");
 
     };
 
@@ -189,11 +194,8 @@ class MudiPixel {
 
         elements.forEach(element => {
             element.addEventListener('click', () => {
-                console.log("Click "+this.interaction3Dplp);
                  this.interaction3Dplp++
              })
-             console.log(element);
-             
         });
 
 
@@ -209,11 +211,16 @@ class MudiPixel {
         /** End process verify  */
         if (this.verifyButtonDetails > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The button more details was not found ❌"); return false; };
 
-        /** Add Evento addToCar || Resend  */
-        element
-            ? (element.parentNode.addEventListener('click', () => this.interactionDetails++),
-                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "button more details Correctly setting 🚀"))
-            : (requestAnimationFrame(this.verifyInteractionDetails.bind(this)), this.verifyButtonDetails++);
+        if (!element) {
+            requestAnimationFrame(this.verifyInteractionDetails.bind(this));
+            this.verifyButtonDetails++;
+            return;
+        }
+
+        const url = new URL(document.querySelector("#iframeMudi").getAttribute("src"));
+        element.parentNode.addEventListener('click', () => this.interactionDetails++);
+        console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "button more details Correctly setting 🚀");
+        this.skuNumber = url.searchParams.get("sku");
 
     };
 
@@ -224,7 +231,7 @@ class MudiPixel {
     async identifyUserMudi() {
 
         /* Mudi user storage*/
-        let userMudi = localStorage.getItem('userMudi');
+        let userMudi = sessionStorage.getItem('userMudi');
 
         /* Petition Server */
         const petitionServerMudi = async () => {
@@ -236,7 +243,7 @@ class MudiPixel {
                 const
                     response = await request.json();
 
-                localStorage.setItem('userMudi', response.data.insertId)
+                sessionStorage.setItem('userMudi', response.data.insertId)
                 this.userID = response.data.insertId;
 
             } catch (error) {
@@ -415,9 +422,15 @@ class MudiPixel {
             const request = fetch('https://viewer.mudi.com.co:3589/api/mudiV1/dataProductsPurchase', {
                 method: 'POST',
                 headers: { "Content-type": "application/json" },
-                body: JSON.stringify(dataProducts)
+                body: JSON.stringify({
+                    products: dataProducts,
+                    total: document.querySelector("#data-total").innerText.replace('$', '').replace(/\./g, '').trim() || 0,
+                    userID: this.userID,
+                    idCompany: this.idCompany,
+                    path: location.href
+                })
             })
-            console.log(bodyToSend);
+            sessionStorage.removeItem("userMudi")
         })
 
     }
@@ -479,8 +492,8 @@ class MudiPixel {
                 const sku = node.querySelector('.media-content-details').children[1].innerText || 'SKU no disponible';
                 const cantidadSelector = node.querySelector('.media-content-details').children[7]?.innerText || 0;
                 const cantidad = Number.isNaN(parseInt(cantidadSelector)) ? 0 : parseInt(cantidadSelector);
-                const total = document.querySelector('.media-price').innerHTML.replace('$', '').replace(/\./g, '').trim() || 'Total no disponible';
-                productos.push({ idCompany, path, name, sku, cantidad, total });
+                const total = node.querySelector('.media-price').innerHTML.replace('$', '').replace(/\./g, '').trim() || 'Total no disponible';
+                productos.push({ name, sku, cantidad, total });
             });
 
 
