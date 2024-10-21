@@ -103,7 +103,7 @@ class MudiPixel {
         }
 
         element.parentNode.addEventListener('click', () => this.addToCar++);
-        this.skuNumber = document.querySelector(".btnsMudiContainer").getAttribute("skunumber");
+        this.skuNumber = document.querySelector(".btnsMudiContainer")?.getAttribute("skunumber") || "";
         console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Add To car Correctly setting 🚀");
 
     };
@@ -176,7 +176,7 @@ class MudiPixel {
         /** Add Evento addToCar || Resend  */
         skuContainer
             ? (
-                this.skuNumber = skuContainer.getAttribute('skunumber'),
+                this.skuNumber = skuContainer?.getAttribute('skunumber') || "",
                 console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "SkuNumber Correctly setting 🚀"))
             : (requestAnimationFrame(this.verifySku.bind(this)), this.verifySkuNumber++);
 
