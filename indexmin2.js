@@ -426,8 +426,7 @@ class MudiPixel {
                     total: document.querySelector("#data-total").innerText.replace('$', '').replace(/\./g, '').trim() || 0,
                     userID: this.userID,
                     idCompany: this.idCompany,
-                    path: location.href,
-                    orderId: document.querySelector('#fc-ei').value || 0
+                    path: location.href
 
                 })
             })
