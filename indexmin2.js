@@ -1,198 +1,513 @@
-const pixelMudi = module.exports;
-const { getTimestamp } = require("../../../services/dateUtils");
-const DB = require("../../../services/mysql");
-const { createPurchase } = require("../../../services/purchaseRegistrySerivce");
-const ReviewResponse = require('../../middleWare/ReviewResponse');
+class MudiPixel {
 
-/** create user Mark */
-pixelMudi.createUser = (req, res) => {
+    /** Builder OBJECT*/
+    constructor() {
 
-    /** queryConsult */
-    const queryConsult = `INSERT INTO registryUserAnalytics VALUES ()`;
+        /** General Info  */
+        this.testType = null;
+        this.userID = null;                 //✔️ 
+        this.path = null;                   //✔️
+        this.device = null;                 //✔️
+        this.detailDevice = null;           //✔️
+        this.date = null;                   //✔️
+        this.timeInSession = null;          //✔️
+        this.skuNumber = null;              //✔️
+        this.idCompany = 147;               //🟠
 
-    /** Hacemos la consulta al servidor */
-    DB.query(queryConsult, (err, data) => {
-        if (err) throw err;
-        ReviewResponse.userAnalytics({ data, res, body: req.body })
-    });
-};
+        /** Events interaction buttons  */
+        this.viewerEvent = 0;               //✔️
+        this.interaction3D = 0;             //✔️
+        this.interactionAR = 0;             //✔️
+        this.interaction3Dplp = 0;       //✔️
+        this.interactionDetails = 0;     //✔️ 
 
-/** Create registry pixel */
-pixelMudi.createregistry = (req, res) => {
-    const timestamp = getTimestamp();
-    const {
-        userID,
-        path,
-        device,
-        detailDevice,
-        dateMudi,
-        timeInSession,
-        viewEvent,
-        interaction3D,
-        interactionAR,
-        addToCar,
-        purchaseClick,
-        category,
-        subCategory,
-        skuNumber,
-        idCompany,
-        testType,
-        interaction3Dplp,
-        interactionDetails
-    } = req.body;
-
-    const queryConsult = `INSERT INTO registryPixel (
-        userID, 
-        path, 
-        device, 
-        detailDevice, 
-        dateMudi , 
-        timeInSession, 
-        viewEvent, 
-        interaction3D, 
-        interactionAR, 
-        addToCar,
-        purchaseClick, 
-        category, 
-        subCategory, 
-        skuNumber, 
-        idCompany,
-        testType,
-        interaction3Dplp,
-        interactionDetails,
-        created_at
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`;
-
-    /** Doing request to DB */
-    DB.query(queryConsult, [
-        userID,
-        path,
-        device,
-        detailDevice,
-        dateMudi,
-        timeInSession,
-        viewEvent,
-        interaction3D,
-        interactionAR,
-        addToCar,
-        purchaseClick,
-        category,
-        subCategory,
-        skuNumber,
-        idCompany,
-        testType,
-        interaction3Dplp,
-        interactionDetails,
-        timestamp
-    ], (err, data) => {
-        if (err) throw err;
-        ReviewResponse.registryPixel({ data, res, body: req.body });
-    });
-};
+        this.addToCar = 0;                  //✔️
+        this.purchaseClick = 0;             //✔️
 
 
-/** Create Data purchase */
-pixelMudi.createRegistryPurchase = async (req, res) => {
-    const { idCompany, userID, total, path, products} = req.body
+        /** Element DOM Verify and SEND */
+        this.category = null;               //✔️✔️
+        this.subCategory = null;            //✔️✔️
 
-    try {
-        await createPurchase({purchase: {idCompany, orderId, userID, total, path}, details: products});
-        res.json({message: "success"});
-    } catch (e) {
-        res.json({ message: "Fallo", error: e });
+        /** VerifyDoms -- Counters */
+        this.verifyAddToCarButton = 0;      //✔️
+        this.verifyButtonPlp = 0;           //✔️
+        this.verifyButtonDetails = 0;       //✔️
+        this.verifyBreadcrumb = 0;          //✔️
+        this.verifyPurchaseButton = 0;      //✔️
+        this.verifyContainerMudiBtns = 0;   //✔️
+        this.btnARVerify = 0;               //✔️
+        this.verifySkuNumber = 0;           //✔️
+
+        /** IndexDataBase */
+        this.DBMudiProducts = null;
+
+    };
+
+    /** Build Test AB */
+    async verifyTestingAB() {
+
+        /** verify Test */
+        let testMudi = sessionStorage.getItem('UserMudiTest');
+
+        if (testMudi !== null) { this.testType = testMudi }
+        else {
+            /** Petition Server */
+            const newBody = { "idCompany": this.idCompany };
+            const request = await fetch(`https://viewer.mudi.com.co:3589/api/mudiv1/getInfoTest`, {
+                method: 'POST',
+                headers: { "Content-type": "application/json" },
+                body: JSON.stringify(newBody)
+            });
+
+            const response = await request.json();
+            await this.updateTesting(response.data[0].test)
+        };
+
+    };
+
+    async updateTesting(lastTest) {
+
+        /** Updatte testing */
+        let testUpdate;
+        lastTest == 'A' ? (testUpdate = 'B') : (testUpdate = 'A');
+
+        const newBody = { "idCompany": this.idCompany, "typeTest": testUpdate };
+        const request = await fetch(`https://viewer.mudi.com.co:3589/api/mudiv1/updateInfoTest`, {
+            method: 'POST',
+            headers: { "Content-type": "application/json" },
+            body: JSON.stringify(newBody)
+        })
+
+        this.testType = testUpdate;
+        sessionStorage.setItem('UserMudiTest', testUpdate)
+    };
+
+    /** Events for DOM verification */
+
+    /** 1. Verify addToCar ✔️ */
+    verifyAddToCar() {
+
+        /** Declared DOM Element */
+        let
+            element = document.body.querySelector(`.cart-add`); // CUSTOM ELEMENT ✔️
+
+        /** End process verify  */
+        if (this.verifyAddToCarButton > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The button to add to cart was not found ❌"); return false; };
+
+        /** Add Evento addToCar || Resend  */
+        if (!element) {
+            requestAnimationFrame(this.verifyAddToCar.bind(this));
+            this.verifyAddToCarButton++;
+            return
+        }
+
+        element.parentNode.addEventListener('click', () => this.addToCar++);
+        this.skuNumber = document.querySelector(".btnsMudiContainer")?.getAttribute("skunumber") || "";
+        console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Add To car Correctly setting 🚀");
+
+    };
+
+    /** 2. Verify Categories ✔️ */
+    verifyCategory() {
+
+        /** Declared DOM BreadCrumb*/
+        let
+            breadcrumb = document.body.querySelector(`.breadcrumb`); // CUSTOM ELEMENT breadcrumb
+
+        /** End process verify  */
+        if (this.verifyBreadcrumb > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "Breadcrumb was not found ❌"); return false };
+        /** Add Evento addToCar || Resend  */
+        breadcrumb
+            ? (this.category = breadcrumb.children[1].innerText,
+                this.subCategory = breadcrumb.children[2].innerText,
+                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Category Correctly setting 🚀"))
+            : (requestAnimationFrame(this.verifyCategory.bind(this)), this.verifyBreadcrumb++);
+    };
+
+    /** 3. VerifyBuyButton -- Purchase Completion ✔️ */
+    verifyPurchase() {
+
+        /** Declared btn Purchase*/
+        let purchaseBtn = document.body.querySelector(`.send-event-purchase`); // CUSTOM ELEMENT breadcrumb
+
+        /** Verify purcahseBtn*/
+        if (this.verifyPurchaseButton > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "Purchase was not found ❌"); return false };
+
+        /** Add Event Purchase || Resend  */
+        purchaseBtn
+            ? (purchaseBtn.addEventListener('click', () => this.purchaseClick++),
+                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Purchase Correctly setting 🚀"))
+            : (requestAnimationFrame(this.verifyPurchase.bind(this)), this.verifyPurchaseButton++);
+    };
+
+    /** 4. Verify container Btns Mudi PDP ✔️ */
+    verifyContainerBtnsMudi() {
+
+        /** Declared DOM Container Btns*/
+        let
+            containerBtnsMudi = document.body.querySelector(`.btnsMudiContainer`); // CUSTOM ELEMENT Container Btns
+
+        /** End process verify  */
+        if (this.verifyContainerMudiBtns > 1500) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "Container Btns Mudi was not found ❌"); return false };
+
+        /** Add Evento addToCar || Resend  */
+        containerBtnsMudi
+            ? (
+                this.viewerEvent++,
+                document.body.querySelector('.btnMudi3D').addEventListener('click', () => {
+                    this.interaction3D++;
+                }),
+                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Container Btns Mudi Correctly setting 🚀"))
+            : (requestAnimationFrame(this.verifyContainerBtnsMudi.bind(this)), this.verifyContainerMudiBtns++);
+
+    };
+
+    /** 6. Verify SKUNumber ✔️*/
+    verifySku() {
+
+        /** Declared DOM Container Btns*/
+        let
+            skuContainer = document.body.querySelector(`.btnsMudiContainer`)// CUSTOM ELEMENT TEXT SKU
+
+        /** End process verify  */
+        if (this.btnARVerify > 1500) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "SkuNumber was not found ❌"); return false };
+
+        /** Add Evento addToCar || Resend  */
+        skuContainer
+            ? (
+                this.skuNumber = skuContainer?.getAttribute('skunumber') || "",
+                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "SkuNumber Correctly setting 🚀"))
+            : (requestAnimationFrame(this.verifySku.bind(this)), this.verifySkuNumber++);
+
+    };
+
+    /** 1. Verify button plp ✔️ */
+    verifyInteractionPLP() {
+
+        /** Declared DOM Element */
+        let
+            elements = document.querySelectorAll('.iconCatMudi_3D'); // CUSTOM ELEMENT ✔️
+
+        /** End process verify  */
+        if (this.verifyButtonPlp > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The Button 3D was not found ❌"); return false; };
+
+        elements.forEach(element => {
+            element.addEventListener('click', () => {
+                 this.interaction3Dplp++
+             })
+        });
+
+
+    };
+
+    /** 1. Verify button details ✔️ */
+    verifyInteractionDetails() {
+
+        /** Declared DOM Element */
+        let
+            element = document.body.querySelector(`.goToSite3D`); // CUSTOM ELEMENT ✔️
+
+        /** End process verify  */
+        if (this.verifyButtonDetails > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The button more details was not found ❌"); return false; };
+
+        if (!element) {
+            requestAnimationFrame(this.verifyInteractionDetails.bind(this));
+            this.verifyButtonDetails++;
+            return;
+        }
+
+        const url = new URL(document.querySelector("#iframeMudi").getAttribute("src"));
+        element.parentNode.addEventListener('click', () => this.interactionDetails++);
+        console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "button more details Correctly setting 🚀");
+        this.skuNumber = url.searchParams.get("sku");
+
+    };
+
+
+    /** Events info General */
+
+    /* 1. identyUser */
+    async identifyUserMudi() {
+
+        /* Mudi user storage*/
+        let userMudi = sessionStorage.getItem('userMudi');
+
+        /* Petition Server */
+        const petitionServerMudi = async () => {
+
+            try {
+                const
+                    request = await fetch('https://viewer.mudi.com.co:3589/api/mudiv1/userAnalitycs');
+
+                const
+                    response = await request.json();
+
+                sessionStorage.setItem('userMudi', response.data.insertId)
+                this.userID = response.data.insertId;
+
+            } catch (error) {
+                throw new Error(error)
+            };
+
+        };
+
+        /* Verification user */
+        userMudi ? this.userID = userMudi : petitionServerMudi();
+
+    };
+
+    /* 2. Get Path */
+    getPath() { this.path = location.href };
+
+    /* 3 & 4. Recognized device */
+    recognizeDevice() {
+
+        //** Define Structure Response */
+        let response = {
+            Device: null,
+            type: `Mobile`
+        };
+
+        const
+            userAgent = navigator.userAgent,
+            listUA = userAgent.split(" ");
+
+        /** Better use REGEX ❌ Add TO DO */
+
+        /** OS Android  */
+        if (userAgent.toLowerCase().includes('android')) {
+            let androidVersion = listUA[2] + ' ' + listUA[3];
+            let androidModel = listUA[4] + ' ' + listUA[5];
+            response.Device = `Android ${androidModel} V-${androidVersion}`;
+        }
+
+        /** IOS */
+        else if (userAgent.toLowerCase().includes('iphone'))
+            response.Device = `iPhone OS ${listUA[5].split('_').join('.')}`;
+        else if (userAgent.toLowerCase().includes('ipad'))
+            response.Device = `iPad OS ${listUA[5].split('_').join('.')}`;
+        else if (userAgent.toLowerCase().includes('Macintosh'))
+            response.Device = `Macintosh OS ${listUA[6].split('_').join('.')}`;
+
+        /** Window */
+        else if (listUA[1].toLowerCase().includes('windows')) {
+            response.Device = `Windows V- ${listUA[3].replace(";", " ")} ${listUA[4].replace(";", " ")}`;
+            response.type = `Desk`
+        }
+
+        /** Linux */
+        else if (userAgent.toLowerCase().includes('linux') && !userAgent.toLowerCase().includes('android')) {
+            response.Device = `Linux`;
+            response.type = `Desk`;
+        }
+
+        /** Unknowled */
+        else {
+            response.Device = "Desconocido"
+            response.type = null;
+        };
+
+        this.device = response.type;
+        this.detailDevice = response.Device;
+    };
+
+    /* 5 Get Date -- FORMAT DATETIME AAAA-MM-DD HH:MM:SS  */
+    getDate() {
+
+        /** Build Date */
+        const dateActual = new Date();
+
+        /** Build information */
+        let dateInfo = {
+            month: dateActual.getMonth() + 1,
+            day: dateActual.getDate(),
+            year: dateActual.getFullYear(),
+            hour: dateActual.getHours(),
+            minute: dateActual.getMinutes(),
+            seconds: dateActual.getSeconds()
+        };
+
+        /** Build Date Sesion  dd -- mm -- aa -- ||  hh -- mm -- ss */
+        this.date = `${dateInfo.year}-${dateInfo.month < 10 ? '0' + dateInfo.month : dateInfo.month}-${dateInfo.day} ${dateInfo.hour < 10 ? '0' + dateInfo.hour : dateInfo.hour}:${dateInfo.minute}:${dateInfo.seconds}`;
+    };
+
+    /* 6 time In Session */
+    timeSesion() {
+
+        /** Configaration Time */
+        let time = {
+            hour: 0,
+            minutes: 0,
+            seconds: 0
+        };
+
+        setInterval(() => {
+
+            /**up one Sec */
+            time.seconds++;
+
+            /** verify Secs */
+            if (time.seconds < 10) {
+                time.seconds = `0${time.seconds}`
+                time.minutes == 0 && (time.minutes = '00')
+                time.hour == 0 && (time.hour = '00')
+            }
+
+            /** VerifyMinutes */
+            if (time.seconds == 60) {
+                time.seconds = '00';
+                time.minutes++;
+                time.minutes < 10 ? time.minutes = `0${time.minutes}` : time.minutes = `${time.minutes}`;
+            }
+
+            /** Verify hours */
+            if (time.minutes == 60) {
+                time.minutes = '00';
+                time.hour++;
+                time.hour < 10 ? time.hour = `0${time.hour}` : time.hour = `${time.hour}`;
+            }
+
+            this.timeInSession = `${time.hour}:${time.minutes}:${time.seconds}`;
+
+        }, 1000);
+    };
+
+    /* Event beforeUnload */
+    addEventBeforeUnload() {
+
+        window.addEventListener('beforeunload', e => {
+
+            let bodyToSend = {
+                userID: this.userID,
+                path: this.path,
+                device: this.device,
+                detailDevice: this.detailDevice,
+                dateMudi: this.date,
+                timeInSession: this.timeInSession,
+                viewEvent: this.viewerEvent,
+                interaction3D: this.interaction3D,
+                interactionAR: this.interactionAR,
+                addToCar: this.addToCar,
+                purchaseClick: this.purchaseClick,
+                category: this.category,
+                subCategory: this.subCategory,
+                skuNumber: this.skuNumber,
+                idCompany: this.idCompany,
+                testType: this.testType,
+                interaction3Dplp: this.interaction3Dplp,
+                interactionDetails: this.interactionDetails
+            };
+
+            const request = fetch('https://viewer.mudi.com.co:3589/api/mudiv1/registryPixelMudi', {
+                method: 'POST',
+                headers: { "Content-type": "application/json" },
+                body: JSON.stringify(bodyToSend)
+            })
+
+        })
+
+    };
+
+    sendDataProducts(dataProducts) {
+        window.addEventListener('beforeunload', e => {
+            // let dataProducts = {
+            //     idCompany: this.idCompany,
+            //     nameProduct: name,
+            //     skuNumber: sku,
+            //     quantity: cantidad,
+            //     totalValue: total
+
+            // };
+            const request = fetch('https://viewer.mudi.com.co:3589/api/mudiV1/dataProductsPurchase', {
+                method: 'POST',
+                headers: { "Content-type": "application/json" },
+                body: JSON.stringify({
+                    products: dataProducts,
+                    total: document.querySelector("#data-total").innerText.replace('$', '').replace(/\./g, '').trim() || 0,
+                    userID: this.userID,
+                    idCompany: this.idCompany,
+                    path: location.href,
+                    orderId: document.querySelector('#fc-ei').value || 0
+
+                })
+            })
+            sessionStorage.removeItem("userMudi")
+        })
+
     }
-};
 
 
+    /** TurnOn pixel Mudi */
+    async pixelMudiOn() {
 
-/** Usabilidad Consulta */
-pixelMudi.usabilityRequest = (req, res) => {
+        await this.identifyUserMudi();
 
-    /** Variables */
-    let
-        tienda = '',
-        interacionSQL = '';
+        this.userID && (
 
-    const { shopper, test, viewEvent, interaction } = req.body;
+            /** Verify Testing AB */
+            this.verifyTestingAB(),
 
-    /** Filtro por tienda */
-    shopper !== '' && (tienda = `AND path LIKE '%${shopper}%' `);
-    interaction !== '' && (interacionSQL = `AND interaction3D ${interaction} 0`);
+            /** DOM VERIFY */
 
-    const queryConsult = `SELECT COUNT(*) AS sessions FROM registryPixel WHERE testType LIKE '${test}' AND viewEvent ${viewEvent} 0 ${interacionSQL} ${tienda}`;
-    DB.query(queryConsult, (err, data) => {
-        if (err) throw err;
-        res.json(data)
-    })
+            /** Verify  add To Car */
+            this.verifyAddToCar(),
+            /** Verify Categories */
+            this.verifyCategory(),
+            /** Verify skuNumber */
+            this.verifySku(),
+            /** Verify Ourchase */
+            this.verifyPurchase(),
 
-};
 
-/** Consulta de engagemen  */
-pixelMudi.engagementRequest = (req, res) => {
+            /** Verify PDP 3D Btn And Evetns interaction 3D  & AR  */
+            this.verifyContainerBtnsMudi(),
+            this.verifyInteractionPLP(),
+            this.verifyInteractionDetails(),
 
-    /** Variables */
-    let
-        tienda = '',
-        interacionSQL = '';
+            /** INFO GENERAL  */
 
-    const { shopper, test, viewEvent, interaction } = req.body;
+            /* Get Path direction */
+            this.getPath(),
+            /* Recognized device */
+            this.recognizeDevice(),
+            /* Get Date */
+            this.getDate(),
+            /* get Time in Session */
+            this.timeSesion(),
 
-    /** Filtro por tienda */
-    shopper !== '' && (tienda = `AND path LIKE '%${shopper}%' `);
-    interaction !== '' && (interacionSQL = `AND interaction3D ${interaction} 0`);
+            /* event To Send */
+            this.addEventBeforeUnload()
 
-    const queryConsult = `SELECT SEC_TO_TIME(ROUND(AVG(TIME_TO_SEC(timeInSession)))) AS time FROM registryPixel WHERE testType LIKE '${test}' AND viewEvent ${viewEvent} 0 ${interacionSQL} ${tienda}`;
-    DB.query(queryConsult, (err, data) => {
-        if (err) throw err;
-        res.json(data)
-    });
+        );
 
-};
+        if (location.pathname === '/checkout') {
 
-/** Consulta de AddToCar */
-pixelMudi.addToCartRequest = (req, res) => {
+            const totalProductos = document.querySelectorAll('.media');
+            let productos = [];
 
-    /** Variables */
-    let
-        tienda = '',
-        interacionSQL = '',
-        addToCarSQL = '';
+            totalProductos.forEach(node => {
 
-    const { shopper, test, viewEvent, interaction, addToCar } = req.body;
+                const idCompany = this.idCompany;
+                const path = this.path;
+                const name = node.querySelector('.media-heading').innerText || 'Nombre no disponible';
+                const sku = node.querySelector('.media-content-details').children[1].innerText || 'SKU no disponible';
+                const cantidadSelector = node.querySelector('.media-content-details').children[7]?.innerText || 0;
+                const cantidad = Number.isNaN(parseInt(cantidadSelector)) ? 0 : parseInt(cantidadSelector);
+                const total = node.querySelector('.media-price').innerHTML.replace('$', '').replace(/\./g, '').trim() || 'Total no disponible';
+                productos.push({ name, sku, cantidad, total });
+            });
 
-    /** Filtro por tienda */
-    shopper !== '' && (tienda = `AND path LIKE '%${shopper}%' `);
-    interaction !== '' && (interacionSQL = `AND interaction3D ${interaction} 0`);
-    addToCar !== '' && (addToCarSQL = `AND addToCar ${addToCar} 0`);
 
-    const queryConsult = `SELECT COUNT(*) AS addToCar FROM registryPixel WHERE testType LIKE '${test}' AND viewEvent ${viewEvent} 0 ${interacionSQL} ${addToCarSQL} ${tienda}`;
-    DB.query(queryConsult, (err, data) => {
-        if (err) throw err;
-        res.json(data)
-    });
+            document.body.querySelector('.send-event-purchase').addEventListener('click', () => {
+                this.sendDataProducts(productos);
+            });
+        };
 
-};
-
-/** Consulta de Purcharse  */
-pixelMudi.purchaseRequest = (req, res) => {
-
-    /** Variables */
-    let
-        tienda = '',
-        interacionSQL = '',
-        purchaseSQL = '';
-
-    const { shopper, test, purchase } = req.body;
-
-    /** Filtro por tienda */
-    shopper !== '' && (tienda = `AND path LIKE '%${shopper}%' `);
-    purchase !== '' && (purchaseSQL = `purchaseClick ${purchase} 0`);
-
-    const queryConsult = `SELECT COUNT(*) AS purchase FROM registryPixel WHERE ${purchaseSQL} AND testType LIKE '${test}' ${tienda} AND path LIKE '%checkout%'`;
-    console.log(queryConsult)
-    DB.query(queryConsult, (err, data) => {
-        if (err) throw err;
-        res.json(data)
-    });
+    };
 
 };
+
+const mudiPixel = new MudiPixel();
+window.mudiPixel = mudiPixel;
+mudiPixel.pixelMudiOn();
