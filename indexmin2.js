@@ -419,7 +419,7 @@ class MudiPixel {
             //     totalValue: total
 
             // };
-            const request = fetch('http://localhost:3589/api/mudiV1/dataProductsPurchase', {
+            const request = fetch('https://viewer.mudi.com.co:3589/api/mudiV1/dataProductsPurchase', {
                 method: 'POST',
                 headers: { "Content-type": "application/json" },
                 body: JSON.stringify({
