@@ -1,4 +1,5 @@
 class MudiPixel {
+
     /** Builder OBJECT*/
     constructor() {
 
@@ -418,7 +419,7 @@ class MudiPixel {
             //     totalValue: total
 
             // };
-            const request = fetch('https://viewer.mudi.com.co:3589/api/mudiV1/dataProductsPurchase', {
+            const request = fetch('http://localhost:3589/api/mudiV1/dataProductsPurchase', {
                 method: 'POST',
                 headers: { "Content-type": "application/json" },
                 body: JSON.stringify({
@@ -426,7 +427,8 @@ class MudiPixel {
                     total: document.querySelector("#data-total").innerText.replace('$', '').replace(/\./g, '').trim() || 0,
                     userID: this.userID,
                     idCompany: this.idCompany,
-                    path: location.href
+                    path: location.href,
+                    orderId: document.querySelector("#fc-ei").value || 0
 
                 })
             })
