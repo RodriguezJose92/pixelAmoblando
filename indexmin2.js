@@ -1,513 +1,467 @@
-class MudiPixel {
+const consultURLMudi = 'https://viewer.mudi.com.co:3589/api/mudiV1';
+const nameCurrentCompany = location.host.split('.')[1] || 'prueba';
 
-    /** Builder OBJECT*/
-    constructor() {
+/** Función para poner una nueva fecha local */
+function localDater() {
+  let year = new Date().getFullYear();
+  let Mont = new Date().getMonth() + 1;
+  let day = new Date().getDate();
+  let hour = new Date().getHours();
+  let minute = new Date().getMinutes();
+  let secs = new Date().getSeconds();
 
-        /** General Info  */
-        this.testType = null;
-        this.userID = null;                 //✔️ 
-        this.path = null;                   //✔️
-        this.device = null;                 //✔️
-        this.detailDevice = null;           //✔️
-        this.date = null;                   //✔️
-        this.timeInSession = null;          //✔️
-        this.skuNumber = null;              //✔️
-        this.idCompany = 147;               //🟠
+  Mont < 10 && (Mont = `0${Mont}`);
+  day < 10 && (day = `0${Mont}`);
+  hour < 10 && (hour = `0${hour}`);
+  minute < 10 && (minute = `0${minute}`);
+  secs < 10 && (secs = `0${secs}`);
 
-        /** Events interaction buttons  */
-        this.viewerEvent = 0;               //✔️
-        this.interaction3D = 0;             //✔️
-        this.interactionAR = 0;             //✔️
-        this.interaction3Dplp = 0;       //✔️
-        this.interactionDetails = 0;     //✔️ 
+  return `${year}-${Mont}-${day} ${hour}:${minute}:${secs}`;
+};
 
-        this.addToCar = 0;                  //✔️
-        this.purchaseClick = 0;             //✔️
+// ----------------------------------------------------------------------------
+/**                                 MUDI USER                                */
+// ----------------------------------------------------------------------------
 
+/** Objeto Usuario de Mudi ✅*/
+class Mudi_User {
 
-        /** Element DOM Verify and SEND */
-        this.category = null;               //✔️✔️
-        this.subCategory = null;            //✔️✔️
+  // attr Private
+  #idUser
 
-        /** VerifyDoms -- Counters */
-        this.verifyAddToCarButton = 0;      //✔️
-        this.verifyButtonPlp = 0;           //✔️
-        this.verifyButtonDetails = 0;       //✔️
-        this.verifyBreadcrumb = 0;          //✔️
-        this.verifyPurchaseButton = 0;      //✔️
-        this.verifyContainerMudiBtns = 0;   //✔️
-        this.btnARVerify = 0;               //✔️
-        this.verifySkuNumber = 0;           //✔️
+  constructor() {
+    this.#idUser;
+  };
 
-        /** IndexDataBase */
-        this.DBMudiProducts = null;
+  /** Modificamos el id del usuario */
+  set setIdUser(id) {
+    if (!id) return;
+    this.#idUser = id
+  };
 
+  /** Retornamos el id del usuario en cuestión */
+  get getIdUser() {
+    return this.#idUser;
+  };
+
+  /** Creación de un nuevo usuario DB MUDI */
+  async createNewUser() {
+    try {
+      const request = await fetch(`${consultURLMudi}/createUserAmoblandoPullman`, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" }
+      })
+      const response = await request.json();
+      this.setIdUser = response.data.insertId;
+      localStorage.setItem('Tracker_Mudi_idUser', response.data.insertId);
+    } catch (error) {
+      console.error(error);
+      console.error(`Mudi error: Error al crear el usuario Mudi`);
     };
 
-    /** Build Test AB */
-    async verifyTestingAB() {
-
-        /** verify Test */
-        let testMudi = sessionStorage.getItem('UserMudiTest');
-
-        if (testMudi !== null) { this.testType = testMudi }
-        else {
-            /** Petition Server */
-            const newBody = { "idCompany": this.idCompany };
-            const request = await fetch(`https://viewer.mudi.com.co:3589/api/mudiv1/getInfoTest`, {
-                method: 'POST',
-                headers: { "Content-type": "application/json" },
-                body: JSON.stringify(newBody)
-            });
-
-            const response = await request.json();
-            await this.updateTesting(response.data[0].test)
-        };
-
-    };
-
-    async updateTesting(lastTest) {
-
-        /** Updatte testing */
-        let testUpdate;
-        lastTest == 'A' ? (testUpdate = 'B') : (testUpdate = 'A');
-
-        const newBody = { "idCompany": this.idCompany, "typeTest": testUpdate };
-        const request = await fetch(`https://viewer.mudi.com.co:3589/api/mudiv1/updateInfoTest`, {
-            method: 'POST',
-            headers: { "Content-type": "application/json" },
-            body: JSON.stringify(newBody)
-        })
-
-        this.testType = testUpdate;
-        sessionStorage.setItem('UserMudiTest', testUpdate)
-    };
-
-    /** Events for DOM verification */
-
-    /** 1. Verify addToCar ✔️ */
-    verifyAddToCar() {
-
-        /** Declared DOM Element */
-        let
-            element = document.body.querySelector(`.cart-add`); // CUSTOM ELEMENT ✔️
-
-        /** End process verify  */
-        if (this.verifyAddToCarButton > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The button to add to cart was not found ❌"); return false; };
-
-        /** Add Evento addToCar || Resend  */
-        if (!element) {
-            requestAnimationFrame(this.verifyAddToCar.bind(this));
-            this.verifyAddToCarButton++;
-            return
-        }
-
-        element.parentNode.addEventListener('click', () => this.addToCar++);
-        this.skuNumber = document.querySelector(".btnsMudiContainer")?.getAttribute("skunumber") || "";
-        console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Add To car Correctly setting 🚀");
-
-    };
-
-    /** 2. Verify Categories ✔️ */
-    verifyCategory() {
-
-        /** Declared DOM BreadCrumb*/
-        let
-            breadcrumb = document.body.querySelector(`.breadcrumb`); // CUSTOM ELEMENT breadcrumb
-
-        /** End process verify  */
-        if (this.verifyBreadcrumb > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "Breadcrumb was not found ❌"); return false };
-        /** Add Evento addToCar || Resend  */
-        breadcrumb
-            ? (this.category = breadcrumb.children[1].innerText,
-                this.subCategory = breadcrumb.children[2].innerText,
-                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Category Correctly setting 🚀"))
-            : (requestAnimationFrame(this.verifyCategory.bind(this)), this.verifyBreadcrumb++);
-    };
-
-    /** 3. VerifyBuyButton -- Purchase Completion ✔️ */
-    verifyPurchase() {
-
-        /** Declared btn Purchase*/
-        let purchaseBtn = document.body.querySelector(`.send-event-purchase`); // CUSTOM ELEMENT breadcrumb
-
-        /** Verify purcahseBtn*/
-        if (this.verifyPurchaseButton > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "Purchase was not found ❌"); return false };
-
-        /** Add Event Purchase || Resend  */
-        purchaseBtn
-            ? (purchaseBtn.addEventListener('click', () => this.purchaseClick++),
-                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Purchase Correctly setting 🚀"))
-            : (requestAnimationFrame(this.verifyPurchase.bind(this)), this.verifyPurchaseButton++);
-    };
-
-    /** 4. Verify container Btns Mudi PDP ✔️ */
-    verifyContainerBtnsMudi() {
-
-        /** Declared DOM Container Btns*/
-        let
-            containerBtnsMudi = document.body.querySelector(`.btnsMudiContainer`); // CUSTOM ELEMENT Container Btns
-
-        /** End process verify  */
-        if (this.verifyContainerMudiBtns > 1500) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "Container Btns Mudi was not found ❌"); return false };
-
-        /** Add Evento addToCar || Resend  */
-        containerBtnsMudi
-            ? (
-                this.viewerEvent++,
-                document.body.querySelector('.btnMudi3D').addEventListener('click', () => {
-                    this.interaction3D++;
-                }),
-                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "Container Btns Mudi Correctly setting 🚀"))
-            : (requestAnimationFrame(this.verifyContainerBtnsMudi.bind(this)), this.verifyContainerMudiBtns++);
-
-    };
-
-    /** 6. Verify SKUNumber ✔️*/
-    verifySku() {
-
-        /** Declared DOM Container Btns*/
-        let
-            skuContainer = document.body.querySelector(`.btnsMudiContainer`)// CUSTOM ELEMENT TEXT SKU
-
-        /** End process verify  */
-        if (this.btnARVerify > 1500) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "SkuNumber was not found ❌"); return false };
-
-        /** Add Evento addToCar || Resend  */
-        skuContainer
-            ? (
-                this.skuNumber = skuContainer?.getAttribute('skunumber') || "",
-                console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "SkuNumber Correctly setting 🚀"))
-            : (requestAnimationFrame(this.verifySku.bind(this)), this.verifySkuNumber++);
-
-    };
-
-    /** 1. Verify button plp ✔️ */
-    verifyInteractionPLP() {
-
-        /** Declared DOM Element */
-        let
-            elements = document.querySelectorAll('.iconCatMudi_3D'); // CUSTOM ELEMENT ✔️
-
-        /** End process verify  */
-        if (this.verifyButtonPlp > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The Button 3D was not found ❌"); return false; };
-
-        elements.forEach(element => {
-            element.addEventListener('click', () => {
-                 this.interaction3Dplp++
-             })
-        });
-
-
-    };
-
-    /** 1. Verify button details ✔️ */
-    verifyInteractionDetails() {
-
-        /** Declared DOM Element */
-        let
-            element = document.body.querySelector(`.goToSite3D`); // CUSTOM ELEMENT ✔️
-
-        /** End process verify  */
-        if (this.verifyButtonDetails > 5000) { console.log("%cMudiPixel:\n", "color:#820ad1; font-weight:600", "The button more details was not found ❌"); return false; };
-
-        if (!element) {
-            requestAnimationFrame(this.verifyInteractionDetails.bind(this));
-            this.verifyButtonDetails++;
-            return;
-        }
-
-        const url = new URL(document.querySelector("#iframeMudi").getAttribute("src"));
-        element.parentNode.addEventListener('click', () => this.interactionDetails++);
-        console.log("%cMudi Pixel: \n", "color:#820ad1; font-weight:600", "button more details Correctly setting 🚀");
-        this.skuNumber = url.searchParams.get("sku");
-
-    };
-
-
-    /** Events info General */
-
-    /* 1. identyUser */
-    async identifyUserMudi() {
-
-        /* Mudi user storage*/
-        let userMudi = sessionStorage.getItem('userMudi');
-
-        /* Petition Server */
-        const petitionServerMudi = async () => {
-
-            try {
-                const
-                    request = await fetch('https://viewer.mudi.com.co:3589/api/mudiv1/userAnalitycs');
-
-                const
-                    response = await request.json();
-
-                sessionStorage.setItem('userMudi', response.data.insertId)
-                this.userID = response.data.insertId;
-
-            } catch (error) {
-                throw new Error(error)
-            };
-
-        };
-
-        /* Verification user */
-        userMudi ? this.userID = userMudi : petitionServerMudi();
-
-    };
-
-    /* 2. Get Path */
-    getPath() { this.path = location.href };
-
-    /* 3 & 4. Recognized device */
-    recognizeDevice() {
-
-        //** Define Structure Response */
-        let response = {
-            Device: null,
-            type: `Mobile`
-        };
-
-        const
-            userAgent = navigator.userAgent,
-            listUA = userAgent.split(" ");
-
-        /** Better use REGEX ❌ Add TO DO */
-
-        /** OS Android  */
-        if (userAgent.toLowerCase().includes('android')) {
-            let androidVersion = listUA[2] + ' ' + listUA[3];
-            let androidModel = listUA[4] + ' ' + listUA[5];
-            response.Device = `Android ${androidModel} V-${androidVersion}`;
-        }
-
-        /** IOS */
-        else if (userAgent.toLowerCase().includes('iphone'))
-            response.Device = `iPhone OS ${listUA[5].split('_').join('.')}`;
-        else if (userAgent.toLowerCase().includes('ipad'))
-            response.Device = `iPad OS ${listUA[5].split('_').join('.')}`;
-        else if (userAgent.toLowerCase().includes('Macintosh'))
-            response.Device = `Macintosh OS ${listUA[6].split('_').join('.')}`;
-
-        /** Window */
-        else if (listUA[1].toLowerCase().includes('windows')) {
-            response.Device = `Windows V- ${listUA[3].replace(";", " ")} ${listUA[4].replace(";", " ")}`;
-            response.type = `Desk`
-        }
-
-        /** Linux */
-        else if (userAgent.toLowerCase().includes('linux') && !userAgent.toLowerCase().includes('android')) {
-            response.Device = `Linux`;
-            response.type = `Desk`;
-        }
-
-        /** Unknowled */
-        else {
-            response.Device = "Desconocido"
-            response.type = null;
-        };
-
-        this.device = response.type;
-        this.detailDevice = response.Device;
-    };
-
-    /* 5 Get Date -- FORMAT DATETIME AAAA-MM-DD HH:MM:SS  */
-    getDate() {
-
-        /** Build Date */
-        const dateActual = new Date();
-
-        /** Build information */
-        let dateInfo = {
-            month: dateActual.getMonth() + 1,
-            day: dateActual.getDate(),
-            year: dateActual.getFullYear(),
-            hour: dateActual.getHours(),
-            minute: dateActual.getMinutes(),
-            seconds: dateActual.getSeconds()
-        };
-
-        /** Build Date Sesion  dd -- mm -- aa -- ||  hh -- mm -- ss */
-        this.date = `${dateInfo.year}-${dateInfo.month < 10 ? '0' + dateInfo.month : dateInfo.month}-${dateInfo.day} ${dateInfo.hour < 10 ? '0' + dateInfo.hour : dateInfo.hour}:${dateInfo.minute}:${dateInfo.seconds}`;
-    };
-
-    /* 6 time In Session */
-    timeSesion() {
-
-        /** Configaration Time */
-        let time = {
-            hour: 0,
-            minutes: 0,
-            seconds: 0
-        };
-
-        setInterval(() => {
-
-            /**up one Sec */
-            time.seconds++;
-
-            /** verify Secs */
-            if (time.seconds < 10) {
-                time.seconds = `0${time.seconds}`
-                time.minutes == 0 && (time.minutes = '00')
-                time.hour == 0 && (time.hour = '00')
-            }
-
-            /** VerifyMinutes */
-            if (time.seconds == 60) {
-                time.seconds = '00';
-                time.minutes++;
-                time.minutes < 10 ? time.minutes = `0${time.minutes}` : time.minutes = `${time.minutes}`;
-            }
-
-            /** Verify hours */
-            if (time.minutes == 60) {
-                time.minutes = '00';
-                time.hour++;
-                time.hour < 10 ? time.hour = `0${time.hour}` : time.hour = `${time.hour}`;
-            }
-
-            this.timeInSession = `${time.hour}:${time.minutes}:${time.seconds}`;
-
-        }, 1000);
-    };
-
-    /* Event beforeUnload */
-    addEventBeforeUnload() {
-
-        window.addEventListener('beforeunload', e => {
-
-            let bodyToSend = {
-                userID: this.userID,
-                path: this.path,
-                device: this.device,
-                detailDevice: this.detailDevice,
-                dateMudi: this.date,
-                timeInSession: this.timeInSession,
-                viewEvent: this.viewerEvent,
-                interaction3D: this.interaction3D,
-                interactionAR: this.interactionAR,
-                addToCar: this.addToCar,
-                purchaseClick: this.purchaseClick,
-                category: this.category,
-                subCategory: this.subCategory,
-                skuNumber: this.skuNumber,
-                idCompany: this.idCompany,
-                testType: this.testType,
-                interaction3Dplp: this.interaction3Dplp,
-                interactionDetails: this.interactionDetails
-            };
-
-            const request = fetch('https://viewer.mudi.com.co:3589/api/mudiv1/registryPixelMudi', {
-                method: 'POST',
-                headers: { "Content-type": "application/json" },
-                body: JSON.stringify(bodyToSend)
-            })
-
-        })
-
-    };
-
-    sendDataProducts(dataProducts) {
-        window.addEventListener('beforeunload', e => {
-            // let dataProducts = {
-            //     idCompany: this.idCompany,
-            //     nameProduct: name,
-            //     skuNumber: sku,
-            //     quantity: cantidad,
-            //     totalValue: total
-
-            // };
-            const request = fetch('https://viewer.mudi.com.co:3589/api/mudiV1/dataProductsPurchase', {
-                method: 'POST',
-                headers: { "Content-type": "application/json" },
-                body: JSON.stringify({
-                    products: dataProducts,
-                    total: document.querySelector("#data-total").innerText.replace('$', '').replace(/\./g, '').trim() || 0,
-                    userID: this.userID,
-                    idCompany: this.idCompany,
-                    path: location.href,
-                    orderId: document.querySelector("#fc-ei").value || 0
-
-                })
-            })
-            sessionStorage.removeItem("userMudi")
-        })
-
-    }
-
-
-    /** TurnOn pixel Mudi */
-    async pixelMudiOn() {
-
-        await this.identifyUserMudi();
-
-        this.userID && (
-
-            /** Verify Testing AB */
-            this.verifyTestingAB(),
-
-            /** DOM VERIFY */
-
-            /** Verify  add To Car */
-            this.verifyAddToCar(),
-            /** Verify Categories */
-            this.verifyCategory(),
-            /** Verify skuNumber */
-            this.verifySku(),
-            /** Verify Ourchase */
-            this.verifyPurchase(),
-
-
-            /** Verify PDP 3D Btn And Evetns interaction 3D  & AR  */
-            this.verifyContainerBtnsMudi(),
-            this.verifyInteractionPLP(),
-            this.verifyInteractionDetails(),
-
-            /** INFO GENERAL  */
-
-            /* Get Path direction */
-            this.getPath(),
-            /* Recognized device */
-            this.recognizeDevice(),
-            /* Get Date */
-            this.getDate(),
-            /* get Time in Session */
-            this.timeSesion(),
-
-            /* event To Send */
-            this.addEventBeforeUnload()
-
-        );
-
-        if (location.pathname === '/checkout') {
-
-            const totalProductos = document.querySelectorAll('.media');
-            let productos = [];
-
-            totalProductos.forEach(node => {
-
-                const idCompany = this.idCompany;
-                const path = this.path;
-                const name = node.querySelector('.media-heading').innerText || 'Nombre no disponible';
-                const sku = node.querySelector('.media-content-details').children[1].innerText || 'SKU no disponible';
-                const cantidadSelector = node.querySelector('.media-content-details').children[7]?.innerText || 0;
-                const cantidad = Number.isNaN(parseInt(cantidadSelector)) ? 0 : parseInt(cantidadSelector);
-                const total = node.querySelector('.media-price').innerHTML.replace('$', '').replace(/\./g, '').trim() || 'Total no disponible';
-                productos.push({ name, sku, cantidad, total });
-            });
-
-
-            document.body.querySelector('.send-event-purchase').addEventListener('click', () => {
-                this.sendDataProducts(productos);
-            });
-        };
-
-    };
+  };
+
+  /** Verificamos si el usuario tiene información antigua */
+  async verifyUser() {
+    const localInfo = localStorage.getItem('Tracker_Mudi_idUser');
+    localInfo
+      ? this.setIdUser = localInfo
+      : await this.createNewUser();
+  };
 
 };
 
-const mudiPixel = new MudiPixel();
-window.mudiPixel = mudiPixel;
-mudiPixel.pixelMudiOn();
+/** Instanciacion del objeto en el site */
+const mudi_user = new Mudi_User();
+await mudi_user.verifyUser();
+
+
+// ----------------------------------------------------------------------------
+/**                                 MUDI SESSION                              */
+// ----------------------------------------------------------------------------
+
+/** Objeto para crear una sesión en Mudi  ✅*/
+class Mudi_Sesion {
+
+  #idSession;
+
+  constructor() {
+    this.#idSession;
+  };
+
+  /** retornar la sesión actual */
+  get getIdSession() {
+    return this.#idSession;
+  };
+
+  /** Actualizar el idSession */
+  set setIdSession(idSession) {
+    if (!idSession) return;
+    this.#idSession = idSession
+  };
+
+  /** Método para obtener la ciudad de la consulta  */
+  async geolocalization() {
+    const response = await fetch('https://ipapi.co/json/');
+    const responseJSON = await response.json();
+    return responseJSON.city
+  };
+
+  /** Método para obtener el dispositivo de la consulta x ancho de pantalla */
+  getDevice() {
+    if (window.innerWidth > 1025) {
+      return 'DESK'
+    } else if (window.innerWidth <= 1024 && window.innerWidth >= 600) {
+      return 'TABLET'
+    } else {
+      return 'MOBILE'
+    }
+  };
+
+  /** Crea una nueva sesión y actualiza los datos locales */
+  async createNewSession() {
+
+    const geoLoc = await this.geolocalization();
+
+    const dataBody = {
+      id_user: mudi_user.getIdUser,
+      device: this.getDevice(),
+      company: nameCurrentCompany,
+      location: geoLoc
+    };
+
+    try {
+
+      const request = await fetch(`${consultURLMudi}/createSessionAmoblandoPullman`, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dataBody)
+      });
+      const response = await request.json();
+      this.setIdSession = response.data.insertId;
+
+      /** Colocamos los valores actualizados en local */
+      localStorage.setItem('Tracker_Mudi_idSession', response.data.insertId);
+      localStorage.setItem('Tracker_Mudi_SessionDate', localDater());
+      localStorage.setItem('Tracker_Mudi_interactionSession', '0');
+
+    }
+    catch (error) {
+      console.error(error);
+      console.error(`Mudi error: erro alc rear la nueva sesión`)
+    };
+
+  };
+
+  /** Verificación de sesión */
+  async verifySesionExist() {
+
+    const lastLocalDate = localStorage.getItem('Tracker_Mudi_SessionDate');
+
+    if (lastLocalDate) {
+
+      const lastDate = new Date(lastLocalDate.replace(' ', 'T'));
+      const currentLocalDate = new Date();
+
+      const diference = currentLocalDate - lastDate;
+      const parseMinutes = diference / (1000 * 60);
+
+      parseMinutes > 30
+        ? this.createNewSession()
+        : (
+          localStorage.setItem('Tracker_Mudi_SessionDate', localDater()),
+          this.setIdSession = localStorage.getItem('Tracker_Mudi_idSession')
+        );
+
+    }
+    else { this.createNewSession() };
+
+  };
+
+};
+
+const mudi_session = new Mudi_Sesion();
+await mudi_session.verifySesionExist();
+
+// ----------------------------------------------------------------------------
+/**                                 MUDI PAGES                               */
+// ----------------------------------------------------------------------------
+
+
+/** Objeto para el comportamiento por página visitada */
+class Mudi_Page {
+
+  #idPage
+
+  constructor() {
+    this.#idPage;
+    this.timeSession = 0;
+  };
+
+  set setIdPage(idPage) {
+    if (!idPage) return;
+    this.#idPage = idPage;
+  };
+
+  get getIdPage() {
+    return this.#idPage;
+  };
+
+  /** Método para contabilizar el tiempo en la pagina de usuario. */
+  setCounterTimeSession() {
+    setInterval(() => {
+      this.timeSession++
+    }, 1000);
+  };
+
+  /** Método que nos permite iniciar el tracking al momento que se abre la página */
+  async initPageTrack() {
+
+    this.setCounterTimeSession();
+
+    const data = {
+      id_session: mudi_session.getIdSession,
+      path: location.pathname
+    };
+
+    if (location.pathname == '/checkout' || location.pathname == '/cart') return;
+
+    try {
+      const request = await fetch(`${consultURLMudi}/createPageViewAmoblandoPullman`, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      const response = await request.json();
+      this.setIdPage = response.data.insertId;
+      console.log(this.getIdPage)
+    } catch (error) {
+      console.error(error);
+      console.error(`Mudi Erro: no se pudo crear el registro de la página en MUDI`)
+    };
+
+  };
+
+  /* 
+    -----------------------------------------------------------------  
+                               Métodos
+    -----------------------------------------------------------------  
+  */
+
+  /** Método para actualizar el tiempo de la sesión */
+  async updateTimeSession() {
+
+    const dataBody = {
+      time_session: this.timeSession,
+      idPagina: this.getIdPage
+    };
+
+    try {
+      const request = await fetch(`${consultURLMudi}/updatePageTimeSession`, {
+        method: 'PATCH',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataBody)
+      });
+    } catch (error) {
+      console.error(error);
+      console.error(`Mudi Error: Actualziación del tiempo de sesión`)
+    };
+
+  };
+
+  /** Método para actualizar el add To Car */
+  async updateAddToCar() {
+
+    const dataBody = {
+      addToCar: 1,
+      idPagina: this.getIdPage
+    };
+
+    try {
+      const request = await fetch(`${consultURLMudi}/updatePageAddToCar`, {
+        method: 'PATCH',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataBody)
+      });
+    } catch (error) {
+      console.error(error);
+      console.error(`Mudi Error: Actualziación del add to car`)
+    };
+
+  };
+
+  /** Método para actualizar el tiempo de la sesión */
+  async updateSize() {
+
+    const dataBody = {
+      interactionSize: 1,
+      idPagina: this.getIdPage
+    };
+
+    try {
+      const request = await fetch(`${consultURLMudi}/updatePageUpdateSize`, {
+        method: 'PATCH',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataBody)
+      });
+    } catch (error) {
+      console.error(error);
+      console.error(`Mudi Error: Actualziación del Size`)
+    };
+
+  };
+
+  /** Método para actualizar el tiempo de la sesión */
+  async updateColor() {
+
+    const dataBody = {
+      interactionColor: 1,
+      idPagina: this.getIdPage
+    };
+
+    try {
+      const request = await fetch(`${consultURLMudi}/updatePageUpdateColor`, {
+        method: 'PATCH',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataBody)
+      });
+    } catch (error) {
+      console.error(error);
+      console.error(`Mudi Error: Actualziación del Color`)
+    };
+
+  };
+
+  /** Método para actualizar el boton de AR */
+  async updateBtnAR() {
+
+    const dataBody = {
+      interactionAR: 1,
+      idPagina: this.getIdPage
+    };
+
+    try {
+      const request = await fetch(`${consultURLMudi}/updatePageUpdateAR`, {
+        method: 'PATCH',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataBody)
+      });
+    } catch (error) {
+      console.error(error);
+      console.error(`Mudi Error: Actualziación del Color`)
+    };
+
+  };
+
+  /** Método para actualizar el boton de AR */
+  async updateBtn3D() {
+
+    const dataBody = {
+      interaction3D: 1,
+      idPagina: this.getIdPage
+    };
+
+    try {
+      const request = await fetch(`${consultURLMudi}/updatePageUpdate3D`, {
+        method: 'PATCH',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataBody)
+      });
+    } catch (error) {
+      console.error(error);
+      console.error(`Mudi Error: Actualziación del Color`)
+    };
+
+  };
+
+};
+
+const mudi_page = new Mudi_Page();
+mudi_page.initPageTrack();
+window.addEventListener('visibilitychange', () => mudi_page.updateTimeSession());
+window.mudiPage = mudi_page;
+
+
+// ----------------------------------------------------------------------------
+/**                                 MUDI PURCHASE                             */
+// ----------------------------------------------------------------------------
+
+/** Objeto encargado de las trassacciones del site */
+class Mudi_Purchase {
+
+  /** Método para sacar la totalidad de los productos ✅*/
+  detailsPurchase() {
+    const totalProductos = document.querySelectorAll('.media');
+    let products = [];
+    totalProductos.forEach(node => {
+      const childrens = node.querySelector('.media-content-details').children;
+      const name = node.querySelector('.media-heading').innerText || 'Nombre no disponible';
+      const skuProduct = childrens[1].innerText || 'SKU no disponible';
+      const quantity = childrens[childrens.length - 1].innerText;
+      const price = node.querySelector('.media-price').innerHTML.replace('$', '').replace(/\./g, '').trim() || 'Total no disponible';
+      products.push({ name, skuProduct, quantity, price });
+    });
+    return products;
+  };
+
+  /** Método para el resumen de la transacción ✅*/
+  verifyPurchase() {
+
+    if (location.pathname == '/checkout') {
+
+      setTimeout(() => {
+        const totalProducts = this.detailsPurchase();
+
+        /** data for purchase */
+        const data = {
+          id_session: null,
+          id_user: null,
+          idOrder: document.querySelector("#fc-ei").value,
+          subTotalValue: document.querySelector('[data-subtotal-tax]').innerHTML.replace('$', ''),
+          travelValue: document.getElementById('data-shipping').innerText.replace('$', ''),
+          ivaValue: document.getElementById('data-iva').innerHTML.replace('$', ''),
+          company: nameCurrentCompany,
+          interacionUser: localStorage.getItem('Tracker_Mudi_interactionSession'),
+          detailProductsPurchase: totalProducts
+        };
+
+        this.clickButonPurchase(data);
+      }, 2500)
+
+    };
+
+  };
+
+  clickButonPurchase(data) {
+
+    document.body.querySelector('.send-event-purchase').addEventListener('click', async () => {
+      try {
+        const request = await fetch(`${consultURLMudi}/createPurchaseAmoblandoPullman`, {
+          method: 'POST',
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        })
+      } catch (error) {
+        console.error(error);
+        console.error(`Mudi Error: Error al  mandar el purchase a la base de datos MUDI`)
+      };
+    });
+
+  };
+
+};
+
+const mudi_purchase = new Mudi_Purchase();
+mudi_purchase.verifyPurchase();
